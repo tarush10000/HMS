@@ -3,12 +3,17 @@ from login_ui import LoginUI
 from doctor_ui import DoctorUI
 from receptionist_ui import ReceptionistUI
 from database import Database, UserRole
+import sys, os
+
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 class HospitalManagementApp:
     def __init__(self):
         self.app = QApplication([])
         self.database = Database()
-
         self.login_ui = LoginUI()
         self.login_ui.login_button.clicked.connect(self.handle_login)
         self.login_ui.show()

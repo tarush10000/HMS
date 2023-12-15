@@ -1,5 +1,11 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox
 from database import Database, UserRole
+import sys, os
+
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 class LoginUI(QWidget):
     def __init__(self, app):
@@ -20,17 +26,10 @@ class LoginUI(QWidget):
         self.login_button = QPushButton('Login')
         self.login_button.clicked.connect(self.login)
 
-        self.role_label = QLabel('Select Role:')
-        self.role_dropdown = QComboBox(self)
-        self.role_dropdown.addItem("Doctor")
-        self.role_dropdown.addItem("Receptionist")
-
         layout.addWidget(self.username_label)
         layout.addWidget(self.username_input)
         layout.addWidget(self.password_label)
         layout.addWidget(self.password_input)
-        layout.addWidget(self.role_label)
-        layout.addWidget(self.role_dropdown)
         layout.addWidget(self.login_button)
 
         self.setLayout(layout)
@@ -44,14 +43,14 @@ class LoginUI(QWidget):
             self.show_error("Username and password are required.")
             return
 
-        user_role = Database.validate_login(username, password)
+        user_ver = Database.validate_login(username, password)
 
-        if user_role == UserRole.DOCTOR and selected_role == "Doctor":
+        if user_ver == 'Doctor':
             self.app.show_doctor_ui()
-        elif user_role == UserRole.RECEPTIONIST and selected_role == "Receptionist":
+        elif user_ver == 'Receptionist':
             self.app.show_receptionist_ui()
         else:
-            self.show_error("Invalid credentials or role selected.")
+            self.show_error("Invalid credentials")
 
     def show_error(self, message):
         error_box = QMessageBox()
