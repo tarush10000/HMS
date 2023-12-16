@@ -12,29 +12,23 @@ class LoginUI(QWidget):
 
     def init_ui(self):
         self.setWindowTitle('Login')
-        screen = QDesktopWidget().screenGeometry()
-        screen_width = screen.width()
-        screen_height = screen.height()
-        self.resize(screen_width, screen_height)
+        self.setFixedSize(1440, 1024)
         self.setStyleSheet("background-color: rgb(255, 255, 255);")
-
-        # Set up the layout
-        layout = QVBoxLayout()
-
         # Set up the widget to contain the form elements
         form_widget = QWidget()
-
-        # Set up the background image
-        background_label = QLabel(form_widget)
-        background_pixmap = QPixmap('design/images/frame1.png')
-        background_label.setPixmap(background_pixmap.scaledToHeight(int(screen_height)))
-        background_label.setMargin(0)
-        background_label.setAlignment(Qt.AlignCenter)
-
+        form_widget.setStyleSheet("background-image: url(design/images/login_bg.png); background-repeat: no-repeat; background-position: center; background-color: rgb(255, 255, 255);")
+        form_widget.setContentsMargins(0, 0, 0, 0)
         # Set up the form layout
         form_layout = QVBoxLayout(form_widget)
-        form_layout.addWidget(background_label)
-        form_layout.setAlignment(Qt.AlignCenter) 
+        form_layout.setAlignment(Qt.AlignCenter)
+        
+        # Create a nested widget to enclose the form elements
+        nested_widget = QWidget()
+        nested_widget.setStyleSheet("background-color: rgb(255, 255, 255); border-radius: 20px; padding: 20px;")
+
+        # Set up the layout for the nested widget
+        nested_layout = QVBoxLayout(nested_widget)
+        nested_layout.setAlignment(Qt.AlignCenter)
 
         # Form elements
         self.login_heading = QLabel('LOGIN INTO YOUR ACCOUNT')
@@ -45,12 +39,11 @@ class LoginUI(QWidget):
         self.username_input.setPlaceholderText('Username')
         self.username_input.setStyleSheet("background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); font: 10pt \"Poppins\"; border: 1px solid rgb(0, 0, 0); border-radius: 20px; padding: 5px;")
         self.username_input.setFixedWidth(int(0.3 * self.width()))
-        
+
         self.password_input = QLineEdit(self)
         self.password_input.setPlaceholderText('Password')
         self.password_input.setStyleSheet("background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); font: 10pt \"Poppins\"; border: 1px solid rgb(0, 0, 0); border-radius: 20px; padding: 5px;")
         self.password_input.setFixedWidth(int(0.3 * self.width()))
-
         self.password_input.setEchoMode(QLineEdit.Password)
 
         self.login_button = QPushButton('Login')
@@ -60,22 +53,23 @@ class LoginUI(QWidget):
         self.login_button.setFixedHeight(40)
         self.login_button.clicked.connect(self.login)
 
-        form_layout.addWidget(self.login_heading)
-        form_layout.addWidget(self.username_input)
-        form_layout.addWidget(self.password_input)
-        form_layout.addWidget(self.login_button)
-        form_layout.setContentsMargins(int(0.3 * self.width()), 0, int(0.3 * self.width()), int(0.3 * self.height()))
+        # Add form elements to the nested widget
+        nested_layout.addWidget(self.login_heading)
+        nested_layout.addWidget(self.username_input)
+        nested_layout.addWidget(self.password_input)
+        nested_layout.addWidget(self.login_button)
+
+        # Set the margins for the nested widget
+        nested_layout.setContentsMargins(0, 0, 0, 0)
+
+        # Add the nested widget to the form layout
+        form_layout.addWidget(nested_widget)
+        form_layout.setContentsMargins(int(0.3 * self.width()), int(0.05 * self.height()), int(0.3 * self.width()), 0)
 
         # Set up the main layout for the whole screen
         main_layout = QVBoxLayout(self)
         main_layout.addWidget(form_widget)
 
-        # Set the main window geometry
-        screen_geometry = QApplication.desktop().screenGeometry()
-        self.setGeometry(screen_geometry)
-
-        # Ensure that the background label is behind the form elements
-        background_label.lower()
     def login(self):
         username = self.username_input.text()
         password = self.password_input.text()

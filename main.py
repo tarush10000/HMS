@@ -31,13 +31,11 @@ class HospitalManagementApp:
     def show_doctor_ui(self):
         self.login_ui.close()
         self.doctor_ui = DoctorUI()
-        # Add any initialization or connections specific to the Doctor UI
         self.doctor_ui.show()
 
     def show_receptionist_ui(self):
         self.login_ui.close()
         self.receptionist_ui = ReceptionistUI()
-        # Add any initialization or connections specific to the Receptionist UI
         self.receptionist_ui.show()
 
     def run(self):

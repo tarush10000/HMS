@@ -1,4 +1,5 @@
 import mysql.connector
+import json
 import sys, os
 
 def resource_path(relative_path):
@@ -8,12 +9,15 @@ def resource_path(relative_path):
 
 class Database:
     def __init__(self):
-        # Replace the following with your actual database connection details
+
+        with open(resource_path('design/serverinfo.json'), 'r') as file:
+            details = json.load(file)
+        
         self.connection = mysql.connector.connect(
-            host='127.0.0.1',
-            user='root',
-            password='Tarush@10000',
-            database='hosp'
+            host=details["host"],
+            user=details["user"],
+            password=details["password"],
+            database=details["database"]
         )
         self.cursor = self.connection.cursor()
 
