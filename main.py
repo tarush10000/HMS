@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QApplication
 from login_ui import LoginUI
 from doctor_ui import DoctorUI
 from receptionist_ui import ReceptionistUI
-from database import Database, UserRole
+from database import Database
 import sys, os
 
 def resource_path(relative_path):
@@ -14,7 +14,7 @@ class HospitalManagementApp:
     def __init__(self):
         self.app = QApplication([])
         self.database = Database()
-        self.login_ui = LoginUI()
+        self.login_ui = LoginUI(self.app)
         self.login_ui.login_button.clicked.connect(self.handle_login)
         self.login_ui.show()
 
@@ -23,9 +23,9 @@ class HospitalManagementApp:
         password = self.login_ui.password_input.text()
 
         user_role = self.database.validate_login(username, password)
-        if user_role == UserRole.DOCTOR:
+        if user_role == 'Doctor':
             self.show_doctor_ui()
-        elif user_role == UserRole.RECEPTIONIST:
+        elif user_role == 'Receptionist':
             self.show_receptionist_ui()
 
     def show_doctor_ui(self):

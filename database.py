@@ -10,10 +10,10 @@ class Database:
     def __init__(self):
         # Replace the following with your actual database connection details
         self.connection = mysql.connector.connect(
-            host='your_mysql_host',
-            user='your_mysql_user',
-            password='your_mysql_password',
-            database='your_database_name'
+            host='127.0.0.1',
+            user='root',
+            password='Tarush@10000',
+            database='hosp'
         )
         self.cursor = self.connection.cursor()
 

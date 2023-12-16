@@ -1,5 +1,7 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox
-from database import Database, UserRole
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox, QFontComboBox
+from PyQt5.QtGui import QFontDatabase
+from database import Database
+from styles import heading_font, heading_text_color
 import sys, os
 
 def resource_path(relative_path):
@@ -16,10 +18,11 @@ class LoginUI(QWidget):
     def init_ui(self):
         self.setWindowTitle('Hospital Management System - Login')
         layout = QVBoxLayout()
-
         self.username_label = QLabel('Username:')
+        self.username_label.setFont(heading_font)
         self.username_input = QLineEdit(self)
         self.password_label = QLabel('Password:')
+        self.password_label.setFont(heading_font)
         self.password_input = QLineEdit(self)
         self.password_input.setEchoMode(QLineEdit.Password)
 
@@ -37,7 +40,6 @@ class LoginUI(QWidget):
     def login(self):
         username = self.username_input.text()
         password = self.password_input.text()
-        selected_role = self.role_dropdown.currentText()
 
         if not username or not password:
             self.show_error("Username and password are required.")
