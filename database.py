@@ -22,8 +22,19 @@ class Database:
         self.cursor = self.connection.cursor()
 
     def validate_login(self, username, password):
+        with open(resource_path('design/serverinfo.json'), 'r') as file:
+            details = json.load(file)
+        
+        self.connection = mysql.connector.connect(
+            host=details["host"],
+            user=details["user"],
+            password=details["password"],
+            database=details["database"]
+        )
+        self.cursor = self.connection.cursor()
+        
         query = "SELECT role FROM users WHERE username = %s AND password = %s"
-        self.cursor.execute(query, (username, password))
+        self.cursor.execute(query, (username, password), multi=False)
         result = self.cursor.fetchone()
 
         if result:

@@ -78,11 +78,11 @@ class LoginUI(QWidget):
             self.show_error("Username and password are required.")
             return
 
-        user_ver = Database.validate_login(username, password)
+        user_ver = Database.validate_login(self.app, username, password)
 
-        if user_ver == 'Doctor':
+        if user_ver == 'doctor':
             self.app.show_doctor_ui()
-        elif user_ver == 'Receptionist':
+        elif user_ver == 'receptionist':
             self.app.show_receptionist_ui()
         else:
             self.show_error("Invalid credentials")
