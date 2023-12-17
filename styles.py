@@ -8,6 +8,7 @@ def resource_path(relative_path):
 
 font_path = resource_path('design/Poppins/Poppins-Regular.ttf')
 
+# style for heading
 heading_font = QFont()
 heading_font.setFamily("Poppins")
 heading_font.setPointSize(20)

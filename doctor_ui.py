@@ -1,11 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QApplication
 from database import Database
 import sys, os
-
-def resource_path(relative_path):
-    if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.abspath("."), relative_path)
 
 class DoctorUI(QWidget):
     def __init__(self, app):
@@ -14,11 +9,17 @@ class DoctorUI(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.setWindowTitle('Hospital Management System - Doctor Dashboard')
+        self.setWindowTitle('Doctor Dashboard')
+        screen_height = self.app.desktop().screenGeometry().height()
+        screen_width = self.app.desktop().screenGeometry().width()
+        self.setFixedSize(screen_width, screen_height)
+        self.setStyleSheet("background-color: rgb(245, 245, 245);")
+        self.showMaximized()
+
         layout = QVBoxLayout()
 
-        welcome_label = QLabel(f"Welcome, Doctor {Database.get_doctor_name()}")
-        # Replace get_doctor_name() with a method that retrieves the doctor's name from the database
+        # welcome_label = QLabel(f"Welcome, Dr. {Database.get_username(self.app)}")
+        welcome_label = QLabel(f"Welcome, Dr.")
 
         logout_button = QPushButton('Logout')
         logout_button.clicked.connect(self.logout)
@@ -29,5 +30,13 @@ class DoctorUI(QWidget):
         self.setLayout(layout)
 
     def logout(self):
-        self.app.show_login_ui()
+        from login_ui import LoginUI
         self.close()
+        self.login_ui = LoginUI(self.app)
+        self.login_ui.show()
+
+if __name__ == '__main__':
+    app = QApplication([])
+    doctor_ui = DoctorUI(app)
+    doctor_ui.show()
+    app.exec_()

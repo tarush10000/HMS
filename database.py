@@ -21,7 +21,7 @@ class Database:
         )
         self.cursor = self.connection.cursor()
 
-    def validate_login(self, username, password):
+    def server_connect(self):
         with open(resource_path('design/serverinfo.json'), 'r') as file:
             details = json.load(file)
         
@@ -32,7 +32,12 @@ class Database:
             database=details["database"]
         )
         self.cursor = self.connection.cursor()
-        
+        return self.cursor
+
+    def validate_login(self, username, password):
+        self.cursor = self.server_connect()
+        global logged_user
+        logged_user = username
         query = "SELECT role FROM users WHERE username = %s AND password = %s"
         self.cursor.execute(query, (username, password), multi=False)
         result = self.cursor.fetchone()
@@ -42,13 +47,8 @@ class Database:
         else:
             return None  # Return None if credentials are invalid
 
-    def get_doctor_name(self):
-        # Implement logic to retrieve the doctor's name from the database
-        pass
-
-    def get_receptionist_name(self):
-        # Implement logic to retrieve the receptionist's name from the database
-        pass
+    def get_username(self):
+        return logged_user
 
     # Add more database-related functions for managing patient records, medicine lists, etc.
 
