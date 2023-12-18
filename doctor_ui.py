@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QApplication, QHBoxLayout, QLineEdit,QComboBox, QMessageBox, QStyle
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QApplication, QHBoxLayout, QLineEdit,QComboBox, QMessageBox, QStyle, QTableWidget, QTableWidgetItem
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from database import Database
@@ -52,6 +52,15 @@ class DoctorUI(QWidget):
         content_top_widget.setStyleSheet("")
         content_top_widget.setContentsMargins(0, 0, 0, 0)
         content_top_widget.setLayout(content_top_layout)
+
+        content_bottom_layout = QHBoxLayout()
+        content_bottom_layout.setAlignment(Qt.AlignVCenter)
+        content_bottom_layout.setContentsMargins(10, 10, 10, 10)
+        content_bottom_layout.setSpacing(0)
+        content_bottom_widget = QWidget()
+        content_bottom_widget.setStyleSheet("")
+        content_bottom_widget.setContentsMargins(0, 0, 0, 0)
+        content_bottom_widget.setLayout(content_bottom_layout)
 
         # welcome_label = QLabel(f"Welcome, Dr. {Database.get_username(self.app)}")
         welcome_label = QLabel(f"Welcome, Dr.")
@@ -164,19 +173,134 @@ class DoctorUI(QWidget):
         logout_button.setFixedWidth(int(0.1*screen_width))
         logout_button.clicked.connect(self.logout)
 
+        #content bottom part
+
+        content_bottom_left_layout = QVBoxLayout()
+        content_bottom_left_layout.setAlignment(Qt.AlignVCenter | Qt.AlignCenter)
+        content_bottom_left_layout.setContentsMargins(0, 0, 0, 0)
+        content_bottom_left_layout.setSpacing(0)
+        content_bottom_left_widget = QWidget()
+        content_bottom_left_widget.setStyleSheet("")
+        content_bottom_left_widget.setContentsMargins(10, 10, 10, 10)
+        content_bottom_left_widget.setLayout(content_bottom_left_layout)
+        content_bottom_left_widget.setFixedWidth(int(0.5*screen_width))
+
+        filter_layout = QHBoxLayout()
+        filter_layout.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
+        filter_layout.setContentsMargins(0, 0, 0, 0)
+        filter_layout.setSpacing(0)
+        filter_widget = QWidget()
+        filter_widget.setStyleSheet("border-radius: 20px; padding: 5px; padding-right: 20px;")
+        filter_widget.setContentsMargins(0, 0, 0, 10)
+        filter_widget.setLayout(filter_layout)
+
+        filter_label = QLabel('Filter By:')
+        filter_label.setStyleSheet("color: rgb(0, 0, 0); font: 10pt \"Poppins\";")
+        filter_label.setFixedHeight(40)
+        filter_label.setContentsMargins(0, 0, 0, 0)
+        filter_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        filter_label.setFixedWidth(int(0.2*screen_width))
+
+        # dropdown for search options / filters
+        filter_options = ['Filter By','All Patients','This Month','This Week', 'Today', 'Queue',]
+        filter_dropdown = QComboBox()
+        filter_dropdown.addItems(filter_options)
+        filter_dropdown.setStyleSheet(
+            "QComboBox {"
+            "    background-color: rgb(255, 255, 255);"
+            "    color: rgb(40, 40, 40);"
+            "    font: 10pt \"Poppins\";"
+            "    padding: 5px;"
+            "    border-top-left-radius: 20px;"
+            "    border-bottom-left-radius: 20px;"
+            "    border-top-right-radius: 0px;"
+            "    border-bottom-right-radius: 0px;"
+            "    margin-right: 0px;"
+            "}"
+            
+            # Set the hover and pressed states
+            "QComboBox:hover {"
+            "    background-color: rgb(240, 240, 240);"
+            "}"
+            "QComboBox:pressed {"
+            "    background-color: rgb(220, 220, 220);"
+            "}"
+
+            # Hide the box at the side
+            "QComboBox::drop-down {"
+            "    border: none;"
+            "}"
+        )
+        filter_dropdown.setCurrentText("Filter By")
+        for i in range(filter_dropdown.count()):
+            filter_dropdown.model().item(i).setFont(QFont(filter_dropdown.font().family(), italic=True))
+        filter_dropdown.setFixedHeight(40)
+        filter_dropdown.setContentsMargins(0, 0, 0, 0)
+        filter_dropdown.setCursor(Qt.PointingHandCursor)
+        filter_dropdown.setFixedHeight(40)
+
+        filter_go_button = QPushButton('Go')
+        filter_go_button.setStyleSheet(
+            "background-color: rgb(67, 79, 194);"
+            "color: rgb(245,245,245);"
+            "font: 10pt \"Poppins\";"
+            "padding: 5px;"
+            "margin-left: 0px;"
+            "border-top-left-radius: 0px;"
+            "border-top-right-radius: 20px;"
+            "border-bottom-left-radius: 0px;"
+            "border-bottom-right-radius: 20px;"
+        )
+        filter_go_button.setCursor(Qt.PointingHandCursor)
+        filter_go_button.setFlat(True)
+        filter_go_button.setFixedHeight(40)
+        filter_go_button.setContentsMargins(0, 0, 0, 0)
+        filter_go_button.setFixedWidth(int(0.03*screen_width))
+        filter_go_button.clicked.connect(lambda: self.populate_table(patient_table, filter_parameter = filter_dropdown.currentText()))
+
+
+        filter_layout.addWidget(filter_label)
+        filter_layout.addWidget(filter_dropdown)
+        filter_layout.addWidget(filter_go_button)
+
+        patient_table = QTableWidget()
+        patient_table.setColumnCount(4)
+        patient_table.setHorizontalHeaderLabels(['Patient ID', 'Patient Name', 'Guardian Name', 'Mobile Number'])
+        patient_table.setStyleSheet(
+            "QTableWidget {"
+            "    background-color: rgb(255, 255, 255);"
+            "    color: rgb(0, 0, 0);"
+            "    font: 10pt \"Poppins\";"
+            "    padding: 5px;"
+            "    border-radius: 0;"
+            "}"
+
+            # Hide the box at the side
+            "QTableWidget::drop-down {"
+            "    border: none;"
+            "}"
+        )
+        patient_table.setContentsMargins(0, 0, 0, 0)
+        
+
+
         content_top_layout.addWidget(welcome_label)
         content_top_layout.addWidget(search_widget)
         content_top_layout.addWidget(logout_button)
 
+        content_bottom_left_layout.addWidget(filter_widget)
+        content_bottom_left_layout.addWidget(patient_table)
+
+        content_bottom_layout.addWidget(content_bottom_left_widget)
+
+
         content_layout.addWidget(content_top_widget)
+        content_layout.addWidget(content_bottom_widget)
 
         layout.addWidget(menu_widget)
         layout.addWidget(content_widget)
 
         self.setLayout(layout)
-
-    def handle_search_dropdown_change(self, search_dropdown):
-        pass
 
     def search(self, search_input, selected_item):
         if search_input == '':
@@ -235,6 +359,24 @@ class DoctorUI(QWidget):
         error_box.setText(message)
         error_box.setStandardButtons(QMessageBox.Ok)
         error_box.exec_()
+
+    def populate_table(self, table, filter_parameter):
+        # Fetch data from the database
+        data = Database().table_filtered_data(filter_parameter)
+
+        # Clear existing data from the table
+        table.clearContents()
+        table.setRowCount(len(data))
+        
+        # Assuming your data has the same number of columns for each row
+        if data:
+            table.setColumnCount(len(data[0]))
+
+            # Populate the table with the fetched data
+            for row_idx, row_data in enumerate(data):
+                for col_idx, cell_data in enumerate(row_data):
+                    item = QTableWidgetItem(str(cell_data))
+                    table.setItem(row_idx, col_idx, item)
 
     def logout(self):
         from login_ui import LoginUI

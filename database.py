@@ -49,6 +49,22 @@ class Database:
 
     def get_username(self):
         return logged_user
+    
+    def table_filtered_data(self, filter_parameter):
+        self.cursor = self.server_connect()
+        if filter_parameter == "All Patients":
+            query = "SELECT idpatients, first_name, guardian, phone_num1 FROM patients_basic ORDER BY idpatients ASC"
+        elif filter_parameter == "This Month":
+            query = "SELECT idpatients, first_name, guardian, phone_num1 FROM patients_basic WHERE MONTH(last_visit) = MONTH(CURRENT_DATE()) AND YEAR(last_visit) = YEAR(CURRENT_DATE()) ORDER BY idpatients ASC"
+        elif filter_parameter == "This Week":
+            query = "SELECT idpatients, first_name, guardian, phone_num1 FROM patients_basic WHERE YEARWEEK(last_visit, 1) = YEARWEEK(CURRENT_DATE(), 1) ORDER BY idpatients ASC"
+        elif filter_parameter == "Today":
+            query = "SELECT idpatients, first_name, guardian, phone_num1 FROM patients_basic WHERE DATE(last_visit) = DATE(NOW()) ORDER BY idpatients ASC"
+        else:
+            query = "SELECT idpatients, first_name, guardian, phone_num1 FROM patients_basic ORDER BY idpatients ASC"
+        self.cursor.execute(query)
+        data = self.cursor.fetchall()
+        return data
 
     # Add more database-related functions for managing patient records, medicine lists, etc.
 
