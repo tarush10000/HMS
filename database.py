@@ -9,17 +9,7 @@ def resource_path(relative_path):
 
 class Database:
     def __init__(self):
-
-        with open(resource_path('design/serverinfo.json'), 'r') as file:
-            details = json.load(file)
-        
-        self.connection = mysql.connector.connect(
-            host=details["host"],
-            user=details["user"],
-            password=details["password"],
-            database=details["database"]
-        )
-        self.cursor = self.connection.cursor()
+        pass
 
     def server_connect(self):
         with open(resource_path('design/serverinfo.json'), 'r') as file:
