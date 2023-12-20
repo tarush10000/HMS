@@ -1,9 +1,14 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QApplication, QHBoxLayout, QLineEdit,QComboBox, QMessageBox, QStyle, QTableWidget, QTableWidgetItem, QAbstractItemView, QPlainTextEdit, QScrollArea
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QApplication, QHBoxLayout, QLineEdit,QComboBox, QMessageBox, QStyle, QTableWidget, QTableWidgetItem, QAbstractItemView, QPlainTextEdit, QScrollArea, QHeaderView, QDateEdit
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QPixmap, QIcon
 from styles import entries_font, unit_font
 from database import Database
 import sys, os
+
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 class DoctorUI(QWidget):
     def __init__(self, app):
@@ -318,11 +323,46 @@ class DoctorUI(QWidget):
         patient_details_widget.setContentsMargins(10, 10, 10, 10)
         patient_details_widget.setLayout(patient_details_layout)
 
+        patient_details_heading_layout = QHBoxLayout()
+        patient_details_heading_layout.setAlignment(Qt.AlignVCenter | Qt.AlignCenter)
+        patient_details_heading_layout.setContentsMargins(0, 0, 0, 0)
+        patient_details_heading_layout.setSpacing(0)
+        patient_details_heading_widget = QWidget()
+        patient_details_heading_widget.setStyleSheet("")
+        patient_details_heading_widget.setContentsMargins(0, 0, 0, 0)
+        patient_details_heading_widget.setLayout(patient_details_heading_layout)
+        patient_details_heading_widget.setFixedHeight(80)
+
         patient_details_label = QLabel('Basic Details')
         patient_details_label.setStyleSheet("color: rgb(0, 0, 0); font: 15pt \"Poppins\"; font-weight: bold;")
         patient_details_label.setFixedHeight(80)
         patient_details_label.setContentsMargins(0, 0, 0, 0)
         patient_details_label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+        patient_details_edit_button = QPushButton()
+        edit_button_image_address = resource_path('design/images/edit.png')
+        edit_button_image = QPixmap(edit_button_image_address)
+        edit_button_image = edit_button_image.scaledToWidth(30)
+        patient_details_edit_button.setIcon(QIcon(edit_button_image))
+        patient_details_edit_button.setIconSize(edit_button_image.rect().size())
+        patient_details_edit_button.setCursor(Qt.PointingHandCursor)
+        patient_details_edit_button.setFlat(True)
+        patient_details_edit_button.clicked.connect(lambda : self.details_edit(patient_first_name, patient_middle_name, patient_last_name, patient_guardian_name, patient_occupation, patient_gender, patient_number1, patient_number2, patient_address, patient_age, patient_dob, patient_weight, patient_height, patient_details_edit_button, patient_details_save_button))
+
+        patient_details_save_button = QPushButton()
+        patient_details_save_button.setVisible(False)
+        save_button_image_address = resource_path('design/images/confirm.png')
+        save_button_image = QPixmap(save_button_image_address)
+        save_button_image = save_button_image.scaledToWidth(30)
+        patient_details_save_button.setIcon(QIcon(save_button_image))
+        patient_details_save_button.setIconSize(save_button_image.rect().size())
+        patient_details_save_button.setCursor(Qt.PointingHandCursor)
+        patient_details_save_button.setFlat(True)
+        patient_details_save_button.clicked.connect(lambda : self.details_save(patient_first_name, patient_middle_name, patient_last_name, patient_guardian_name, patient_occupation, patient_gender, patient_number1, patient_number2, patient_address, patient_age, patient_dob, patient_weight, patient_height, patient_details_edit_button, patient_details_save_button))
+
+        patient_details_heading_layout.addWidget(patient_details_label)
+        patient_details_heading_layout.addWidget(patient_details_edit_button)
+        patient_details_heading_layout.addWidget(patient_details_save_button)
 
         patient_name_layout = QHBoxLayout()
         patient_name_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
@@ -661,11 +701,47 @@ class DoctorUI(QWidget):
         patient_weight_height_layout.addWidget(patient_height)
         patient_weight_height_layout.addWidget(patient_height_unit)
 
+
+        patient_report_heading_layout = QHBoxLayout()
+        patient_report_heading_layout.setAlignment(Qt.AlignVCenter | Qt.AlignCenter)
+        patient_report_heading_layout.setContentsMargins(0, 0, 0, 0)
+        patient_report_heading_layout.setSpacing(0)
+        patient_report_heading_widget = QWidget()
+        patient_report_heading_widget.setStyleSheet("")
+        patient_report_heading_widget.setContentsMargins(0, 0, 0, 0)
+        patient_report_heading_widget.setLayout(patient_report_heading_layout)
+        patient_report_heading_widget.setFixedHeight(80)
+
         patient_report_label = QLabel('Test Results')
         patient_report_label.setStyleSheet("color: rgb(0, 0, 0); font: 15pt \"Poppins\"; font-weight: bold;")
         patient_report_label.setFixedHeight(80)
         patient_report_label.setContentsMargins(0, 0, 0, 0)
         patient_report_label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+        patient_report_edit_button = QPushButton()
+        edit_button_image_address = resource_path('design/images/edit.png')
+        edit_button_image = QPixmap(edit_button_image_address)
+        edit_button_image = edit_button_image.scaledToWidth(30)
+        patient_report_edit_button.setIcon(QIcon(edit_button_image))
+        patient_report_edit_button.setIconSize(edit_button_image.rect().size())
+        patient_report_edit_button.setCursor(Qt.PointingHandCursor)
+        patient_report_edit_button.setFlat(True)
+        patient_report_edit_button.clicked.connect(lambda : self.report_edit(patient_blood_group, patient_hb, patient_vdlr, patient_TLC, patient_hiv, patient_plt, patient_hbsag, patient_bsugar, patient_antihcv, patient_gct, patient_igm, patient_gtt, patient_igg, patient_bil, patient_urea, patient_sgot, patient_creat, patient_sgpt, patient_ua, patient_alkphos, patient_dualmar, patient_protein, patient_triplemar, patient_t3t4tsh, patient_quadtest, patient_hba1c, patient_hplc, patient_ict, patient_chestxray, patient_ecg, patient_echo, patient_ptinr, patient_urine, patient_USG, patient_other, patient_report_edit_button, patient_report_save_button))
+
+        patient_report_save_button = QPushButton()
+        patient_report_save_button.setVisible(False)
+        save_button_image_address = resource_path('design/images/confirm.png')
+        save_button_image = QPixmap(save_button_image_address)
+        save_button_image = save_button_image.scaledToWidth(30)
+        patient_report_save_button.setIcon(QIcon(save_button_image))
+        patient_report_save_button.setIconSize(save_button_image.rect().size())
+        patient_report_save_button.setCursor(Qt.PointingHandCursor)
+        patient_report_save_button.setFlat(True)
+        patient_report_save_button.clicked.connect(lambda : self.report_save(patient_blood_group, patient_hb, patient_vdlr, patient_TLC, patient_hiv, patient_plt, patient_hbsag, patient_bsugar, patient_antihcv, patient_gct, patient_igm, patient_gtt, patient_igg, patient_bil, patient_urea, patient_sgot, patient_creat, patient_sgpt, patient_ua, patient_alkphos, patient_dualmar, patient_protein, patient_triplemar, patient_t3t4tsh, patient_quadtest, patient_hba1c, patient_hplc, patient_ict, patient_chestxray, patient_ecg, patient_echo, patient_ptinr, patient_urine, patient_USG, patient_other, patient_report_edit_button, patient_report_save_button))
+
+        patient_report_heading_layout.addWidget(patient_report_label)
+        patient_report_heading_layout.addWidget(patient_report_edit_button)
+        patient_report_heading_layout.addWidget(patient_report_save_button)
 
         patient_blood_group_layout = QHBoxLayout()
         patient_blood_group_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
@@ -1612,17 +1688,17 @@ class DoctorUI(QWidget):
 
         patient_other_layout = QHBoxLayout()
         patient_other_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        patient_other_layout.setContentsMargins(0, 0, 0, 0)
+        patient_other_layout.setContentsMargins(0, 0, 0, 10)
         patient_other_layout.setSpacing(0)
         patient_other_widget = QWidget()
         patient_other_widget.setStyleSheet("")
-        patient_other_widget.setContentsMargins(0, 5, 0, 5)
+        patient_other_widget.setContentsMargins(0, 5, 0, 10)
         patient_other_widget.setLayout(patient_other_layout)
         patient_other_label = QLabel('Other: ')
         patient_other_label.setFont(entries_font)
         patient_other_label.setFixedHeight(40)
         patient_other_label.setFixedWidth(int(0.06*screen_width))
-        patient_other_label.setContentsMargins(0, 0, 0, 0)
+        patient_other_label.setContentsMargins(0, 0, 0, 10)
         patient_other = QPlainTextEdit(self)
         patient_other.setReadOnly(True)
         patient_other.setStyleSheet(
@@ -1642,9 +1718,224 @@ class DoctorUI(QWidget):
         patient_other_layout.addWidget(patient_other_label)
         patient_other_layout.addWidget(patient_other)
 
+        patient_complaints_history_label = QLabel('Complaints History')
+        patient_complaints_history_label.setStyleSheet("color: rgb(0, 0, 0); font: 15pt \"Poppins\"; font-weight: bold;")
+        patient_complaints_history_label.setFixedHeight(80)
+        patient_complaints_history_label.setContentsMargins(0, 0, 0, 0)
+        patient_complaints_history_label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
 
+        patient_complaints_add_layout = QHBoxLayout()
+        patient_complaints_add_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        patient_complaints_add_layout.setContentsMargins(0, 0, 0, 0)
+        patient_complaints_add_layout.setSpacing(0)
+        patient_complaints_add_widget = QWidget()
+        patient_complaints_add_widget.setStyleSheet("")
+        patient_complaints_add_widget.setContentsMargins(0, 5, 0, 5)
+        patient_complaints_add_widget.setLayout(patient_complaints_add_layout)
+        patient_complaints_label = QLabel('Complaint: ')
+        patient_complaints_label.setFont(entries_font)
+        patient_complaints_label.setFixedHeight(40)
+        patient_complaints_label.setFixedWidth(int(0.06*screen_width))
+        patient_complaints_label.setContentsMargins(0, 0, 0, 0)
+        patient_complaints_options = ['Headache', 'Fever','Constipation', 'Diarrhoea', 'Cough', 'Cold', 'Other']
+        patient_complaints_dropdown = QComboBox()
+        patient_complaints_dropdown.addItems(patient_complaints_options)
+        patient_complaints_dropdown.setStyleSheet(
+            "QComboBox {"
+            "    background-color: rgb(255, 255, 255);"
+            "    color: rgb(40, 40, 40);"
+            "    font: 10pt \"Poppins\";"
+            "    padding: 5px;"
+            "    border-radius: 20px;"
+            "}"
+            
+            # Set the hover and pressed states
+            "QComboBox:hover {"
+            "    background-color: rgb(240, 240, 240);"
+            "}"
+            "QComboBox:pressed {"
+            "    background-color: rgb(220, 220, 220);"
+            "}"
 
-        patient_details_layout.addWidget(patient_details_label)
+            # Hide the box at the side
+            "QComboBox::drop-down {"
+            "    border: none;"
+            "}"
+        )
+        patient_complaints_dropdown.setFixedHeight(40)
+        patient_complaints_dropdown.setFixedWidth(int(0.08*screen_width))
+        patient_complaints_dropdown.setContentsMargins(0, 0, 0, 0)
+        patient_complaints_dropdown.setFont(QFont(patient_complaints_dropdown.font().family(), italic=True))
+
+        patient_complaints_text = QLineEdit(self)
+        patient_complaints_text.setStyleSheet(
+            "background-color: rgb(255, 255, 255);"
+            "color: rgb(40, 40, 40);"
+            "font: 10pt \"Poppins\";"
+            "padding: 5px;"
+            "border-radius: 20px;"
+        )
+        patient_complaints_text.setVisible(False)
+        patient_complaints_text.setFixedHeight(40)
+        patient_complaints_text.setFixedWidth(int(0.3*screen_width))
+        patient_complaints_text.setContentsMargins(0, 0, 0, 0)
+        patient_complaints_text.setFont(QFont(patient_complaints_text.font().family(), italic=True))
+
+        patient_complaint_duration = QLineEdit(self)
+        patient_complaint_duration.setStyleSheet(
+            "background-color: rgb(255, 255, 255);"
+            "color: rgb(40, 40, 40);"
+            "font: 10pt \"Poppins\";"
+            "padding: 5px;"
+            "border-radius: 20px;"
+        )
+        patient_complaint_duration.setFixedHeight(40)
+        patient_complaint_duration.setFixedWidth(int(0.08*screen_width))
+        patient_complaint_duration.setContentsMargins(0, 0, 0, 0)
+        patient_complaint_duration.setFont(QFont(patient_complaint_duration.font().family(), italic=True))
+        patient_complaint_duration.setPlaceholderText('Duration')
+
+        patient_complaint_add_button = QPushButton('Add')
+        patient_complaint_add_button.setStyleSheet(
+            "background-color: rgb(67, 79, 194);"
+            "color: rgb(245, 245, 245);"
+            "font: 10pt \"Poppins\";"
+            "border-radius: 20px;"
+        )
+        patient_complaint_add_button.setFixedHeight(40)
+        patient_complaint_add_button.setFixedWidth(int(0.08*screen_width))
+        patient_complaint_add_button.setContentsMargins(0, 0, 0, 0)
+        patient_complaint_add_button.clicked.connect(lambda: self.add_complaint(patient_complaints_table, patient_complaints_dropdown.currentText(), patient_complaint_duration.text(), patient_complaints_text.text()))
+        patient_complaints_add_layout.addWidget(patient_complaints_label)
+        patient_complaints_add_layout.addWidget(patient_complaints_dropdown)
+        patient_complaints_dropdown.currentIndexChanged.connect(lambda: self.complaint_dropdown_changed(patient_complaints_dropdown.currentText(), patient_complaints_text))
+        patient_complaints_add_layout.addWidget(patient_complaint_duration)
+        patient_complaints_add_layout.addWidget(patient_complaint_add_button)
+
+        patient_complaints_table = QTableWidget()
+        patient_complaints_table.setStyleSheet(
+            "QTableWidget {"
+            "    background-color: rgb(255, 255, 255);"
+            "    color: rgb(40, 40, 40);"
+            "    font: 10pt \"Poppins\";"
+            "    padding: 5px;"
+            "    border-radius: 20px;"
+            "}"
+
+            # Hide the box at the side
+            "QTableWidget::drop-down {"
+            "    border: none;"
+            "}"
+        )
+        patient_complaints_table.setFixedHeight(200)
+        patient_complaints_table.setFixedWidth(int(0.24*screen_width))
+        patient_complaints_table.setViewportMargins(0, 10, 0, 0)
+        patient_complaints_table.setContentsMargins(0, 10, 0, 0)
+        patient_complaints_table.setFont(QFont(patient_complaints_table.font().family(), italic=True))
+        patient_complaints_table.setColumnCount(2)
+        patient_complaints_table.setRowCount(0)
+        
+        if patient_complaints_table.rowCount() == 0:
+            patient_complaints_table.setVisible(False)
+        
+        patient_complaints_table.setHorizontalHeaderLabels(['Complaint', 'Duration'])
+        patient_complaints_table.horizontalHeader().setStyleSheet(
+            "QHeaderView {"
+            "    background-color: rgb(67, 79, 194);"
+            "    color: rgb(0, 0, 0);"
+            "    font: 10pt \"Poppins\";"
+            "    border-radius: 20px;"
+            "}"
+        )
+        patient_complaints_table.horizontalHeader().setFixedHeight(40)
+        patient_complaints_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        patient_complaints_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        patient_complaints_table.verticalHeader().hide()
+        patient_complaints_table.setShowGrid(False)
+        patient_complaints_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        patient_complaints_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        patient_complaints_table.setSelectionMode(QAbstractItemView.SingleSelection)
+        patient_complaints_table.setAlternatingRowColors(True)
+        patient_complaints_table.setStyleSheet(
+            "QTableView {"
+            "    background-color: rgb(255, 255, 255);"
+            "    alternate-background-color: rgb(240, 240, 240);"
+            "    color: rgb(40, 40, 40);"
+            "    font: 10pt \"Poppins\";"
+            "    padding: 5px;"
+            "    border-radius: 20px;"
+            "}"
+        )
+        patient_complaints_table.verticalScrollBar().setStyleSheet(
+            "QScrollBar:vertical {"
+            "    border: 0px;"
+            "    background: #f0f0f0;"
+            "    width: 10px;"
+            "    margin: 0px 0px 0px 0px;"
+            "}"
+
+            "QScrollBar::handle:vertical {"
+            "    background: #666666;"
+            "    min-height: 20px;"
+            "}"
+
+            "QScrollBar::add-line:vertical {"
+            "    height: 0px;"
+            "    subcontrol-position: bottom;"
+            "    subcontrol-origin: margin;"
+            "}"
+
+            "QScrollBar::sub-line:vertical {"
+            "    height: 0 px;"
+            "    subcontrol-position: top;"
+            "    subcontrol-origin: margin;"
+            "}"
+        )
+        patient_complaints_table.itemDoubleClicked.connect(lambda item: self.delete_row(item, patient_complaints_table))
+
+        patient_lmp_layout = QHBoxLayout()
+        patient_lmp_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        patient_lmp_layout.setContentsMargins(0, 0, 0, 0)
+        patient_lmp_layout.setSpacing(0)
+        patient_lmp_widget = QWidget()
+        patient_lmp_widget.setStyleSheet("")
+        patient_lmp_widget.setContentsMargins(0, 5, 0, 5)
+        patient_lmp_widget.setLayout(patient_lmp_layout)
+        patient_lmp_label = QLabel('LMP: ')
+        patient_lmp_label.setFont(entries_font)
+        patient_lmp_label.setFixedHeight(40)
+        patient_lmp_label.setFixedWidth(int(0.06*screen_width))
+        patient_lmp_label.setContentsMargins(0, 0, 0, 0)
+        patient_lmp = QDateEdit(self)
+        patient_lmp.setReadOnly(True)
+        patient_lmp.setDisplayFormat("dd-MM-yyyy")  # Set the desired date format
+        patient_lmp.setStyleSheet("""
+            QDateEdit {
+                background-color: rgb(255, 255, 255);
+                color: rgb(40, 40, 40);
+                font: 10pt "Poppins";
+                padding: 5px;
+                border-radius: 20px;
+                border-top-right-radius: 0px;
+                border-bottom-right-radius: 0px;
+            }
+
+            QDateEdit::drop-down {
+                subcontrol-origin: padding;
+                subcontrol-position: top right;
+                width: 20px;
+                border-left: 1px solid rgb(40, 40, 40);
+            }
+        """)
+        patient_lmp.setFixedHeight(40)
+        patient_lmp.setFixedWidth(int(0.08*screen_width))
+        patient_lmp.setContentsMargins(0, 0, 0, 0)
+
+        patient_lmp_layout.addWidget(patient_lmp_label)
+        patient_lmp_layout.addWidget(patient_lmp)
+
+        
+        patient_details_layout.addWidget(patient_details_heading_widget)
         patient_details_layout.addWidget(patient_name_widget)
         patient_details_layout.addWidget(patient_guardian_widget)
         patient_details_layout.addWidget(patient_occ_gen_widget)
@@ -1653,7 +1944,7 @@ class DoctorUI(QWidget):
         patient_details_layout.addWidget(patient_address_widget)
         patient_details_layout.addWidget(patient_age_widget)
         patient_details_layout.addWidget(patient_weight_height_widget)
-        patient_details_layout.addWidget(patient_report_label)
+        patient_details_layout.addWidget(patient_report_heading_widget)
         patient_details_layout.addWidget(patient_blood_group_widget)
         patient_details_layout.addWidget(patient_vdlr_TLC_widget)
         patient_details_layout.addWidget(patient_hiv_plt_widget)
@@ -1673,6 +1964,12 @@ class DoctorUI(QWidget):
         patient_details_layout.addWidget(patient_urine_widget)
         patient_details_layout.addWidget(patient_USG_widget)
         patient_details_layout.addWidget(patient_other_widget)
+        patient_details_layout.addWidget(patient_complaints_history_label)
+        patient_details_layout.addWidget(patient_complaints_add_widget)
+        patient_details_layout.addWidget(patient_complaints_text)
+        patient_details_layout.addWidget(patient_complaints_table)
+        patient_details_layout.addWidget(patient_lmp_widget)
+        
 
 
         scroll_area.setWidget(patient_details_widget)
@@ -1810,6 +2107,147 @@ class DoctorUI(QWidget):
         row = item.row()
         patient_id = patient_table.item(row, 0).text()
         print(f"Row {row} double-clicked. Patient ID: {patient_id}")
+
+    def complaint_dropdown_changed(self, complaint, text):
+        if complaint == 'Other':
+            text.setVisible(True)
+        else:
+            text.setVisible(False)
+
+    def add_complaint(self, table, complaint, duration, other):
+
+        if complaint == 'Other' and other == '':
+            self.show_error("Please enter a valid complaint")
+            return
+        elif duration == '':
+            self.show_error("Please enter a valid duration")
+            return
+        
+        table.setVisible(True)
+        table.insertRow(table.rowCount())
+        if complaint == 'Other':
+            table.setItem(table.rowCount()-1, 0, QTableWidgetItem(other))
+        else:
+            table.setItem(table.rowCount()-1, 0, QTableWidgetItem(complaint))
+        table.setItem(table.rowCount()-1, 1, QTableWidgetItem(duration))
+
+    def delete_row(self, item, table):
+        row = item.row()
+        table.removeRow(row)
+        if table.rowCount() == 0:
+            table.setVisible(False)
+
+    def details_edit(self, first_name, middle_name, last_name, guardian_name, occupation, gender, number1, number2, address, age, dob, weight, height, details_edit_button, details_save_button):
+        first_name.setReadOnly(False)
+        middle_name.setReadOnly(False)
+        last_name.setReadOnly(False)
+        guardian_name.setReadOnly(False)
+        occupation.setReadOnly(False)
+        gender.setReadOnly(False)
+        number1.setReadOnly(False)
+        number2.setReadOnly(False)
+        address.setReadOnly(False)
+        age.setReadOnly(False)
+        dob.setReadOnly(False)
+        weight.setReadOnly(False)
+        height.setReadOnly(False)
+        details_edit_button.setVisible(False)
+        details_save_button.setVisible(True)
+
+    def details_save(self, first_name, middle_name, last_name, guardian_name, occupation, gender, number1, number2, address, age, dob, weight, height, details_edit_button, details_save_button):
+        first_name.setReadOnly(True)
+        middle_name.setReadOnly(True)
+        last_name.setReadOnly(True)
+        guardian_name.setReadOnly(True)
+        occupation.setReadOnly(True)
+        gender.setReadOnly(True)
+        number1.setReadOnly(True)
+        number2.setReadOnly(True)
+        address.setReadOnly(True)
+        age.setReadOnly(True)
+        dob.setReadOnly(True)
+        weight.setReadOnly(True)
+        height.setReadOnly(True)
+        details_edit_button.setVisible(True)
+        details_save_button.setVisible(False)
+
+    def report_edit(self, blood_group, hb, vdlr, TLC, hiv, plt, hbsag, bsugar, antihcv, gct, igm, gtt, igg, bil, urea, sgot, creat, sgpt, ua, alkphos, dualmar, protein, triplemar, t3t4tsh, quadtest, hba1c, hplc, ict, chestxray, ecg, echo, ptinr, urine, USG, other, report_edit_button, report_save_button):
+        blood_group.setReadOnly(False)
+        hb.setReadOnly(False)
+        vdlr.setReadOnly(False)
+        TLC.setReadOnly(False)
+        hiv.setReadOnly(False)
+        plt.setReadOnly(False)
+        hbsag.setReadOnly(False)
+        bsugar.setReadOnly(False)   
+        antihcv.setReadOnly(False)
+        gct.setReadOnly(False)
+        igm.setReadOnly(False)
+        gtt.setReadOnly(False)
+        igg.setReadOnly(False)
+        bil.setReadOnly(False)
+        urea.setReadOnly(False)
+        sgot.setReadOnly(False)
+        creat.setReadOnly(False)
+        sgpt.setReadOnly(False)
+        ua.setReadOnly(False)
+        alkphos.setReadOnly(False)
+        dualmar.setReadOnly(False)
+        protein.setReadOnly(False)
+        triplemar.setReadOnly(False)
+        t3t4tsh.setReadOnly(False)
+        quadtest.setReadOnly(False)
+        hba1c.setReadOnly(False)
+        hplc.setReadOnly(False)
+        ict.setReadOnly(False)
+        chestxray.setReadOnly(False)
+        ecg.setReadOnly(False)
+        echo.setReadOnly(False)
+        ptinr.setReadOnly(False)
+        urine.setReadOnly(False)
+        USG.setReadOnly(False)
+        other.setReadOnly(False)
+        report_edit_button.setVisible(False)
+        report_save_button.setVisible(True)
+
+    def report_save(self, blood_group, hb, vdlr, TLC, hiv, plt, hbsag, bsugar, antihcv, gct, igm, gtt, igg, bil, urea, sgot, creat, sgpt, ua, alkphos, dualmar, protein, triplemar, t3t4tsh, quadtest, hba1c, hplc, ict, chestxray, ecg, echo, ptinr, urine, USG, other, report_edit_button, report_save_button):
+        blood_group.setReadOnly(True)
+        hb.setReadOnly(True)
+        vdlr.setReadOnly(True)
+        TLC.setReadOnly(True)
+        hiv.setReadOnly(True)
+        plt.setReadOnly(True)
+        hbsag.setReadOnly(True)
+        bsugar.setReadOnly(True)   
+        antihcv.setReadOnly(True)
+        gct.setReadOnly(True)
+        igm.setReadOnly(True)
+        gtt.setReadOnly(True)
+        igg.setReadOnly(True)
+        bil.setReadOnly(True)
+        urea.setReadOnly(True)
+        sgot.setReadOnly(True)
+        creat.setReadOnly(True)
+        sgpt.setReadOnly(True)
+        ua.setReadOnly(True)
+        alkphos.setReadOnly(True)
+        dualmar.setReadOnly(True)
+        protein.setReadOnly(True)
+        triplemar.setReadOnly(True)
+        t3t4tsh.setReadOnly(True)
+        quadtest.setReadOnly(True)
+        hba1c.setReadOnly(True)
+        hplc.setReadOnly(True)
+        ict.setReadOnly(True)
+        chestxray.setReadOnly(True)
+        ecg.setReadOnly(True)
+        echo.setReadOnly(True)
+        ptinr.setReadOnly(True)
+        urine.setReadOnly(True)
+        USG.setReadOnly(True)
+        other.setReadOnly(True)
+        report_edit_button.setVisible(True)
+        report_save_button.setVisible(False)
 
     def logout(self):
         from login_ui import LoginUI
