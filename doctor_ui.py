@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QApplication, QHBoxLayout, QLineEdit,QComboBox, QMessageBox, QStyle, QTableWidget, QTableWidgetItem, QAbstractItemView, QPlainTextEdit, QScrollArea, QHeaderView, QDateEdit
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QApplication, QHBoxLayout, QLineEdit,QComboBox, QMessageBox, QStyle, QTableWidget, QTableWidgetItem, QAbstractItemView, QPlainTextEdit, QScrollArea, QHeaderView, QDateEdit, QTimeEdit
+from PyQt5.QtCore import Qt, QDateTime, QDate, QTime
 from PyQt5.QtGui import QFont, QPixmap, QIcon
 from styles import entries_font, unit_font
 from database import Database
@@ -1718,11 +1718,47 @@ class DoctorUI(QWidget):
         patient_other_layout.addWidget(patient_other_label)
         patient_other_layout.addWidget(patient_other)
 
+        patient_complaint_history_header_layout = QHBoxLayout()
+        patient_complaint_history_header_layout.setAlignment(Qt.AlignVCenter | Qt.AlignCenter)
+        patient_complaint_history_header_layout.setContentsMargins(0, 0, 0, 0)
+        patient_complaint_history_header_layout.setSpacing(0)
+        patient_complaint_history_header_widget = QWidget()
+        patient_complaint_history_header_widget.setStyleSheet("")
+        patient_complaint_history_header_widget.setContentsMargins(0, 5, 0, 5)
+        patient_complaint_history_header_widget.setLayout(patient_complaint_history_header_layout)
+
         patient_complaints_history_label = QLabel('Complaints History')
         patient_complaints_history_label.setStyleSheet("color: rgb(0, 0, 0); font: 15pt \"Poppins\"; font-weight: bold;")
         patient_complaints_history_label.setFixedHeight(80)
         patient_complaints_history_label.setContentsMargins(0, 0, 0, 0)
         patient_complaints_history_label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+
+        patient_complaints_edit_button = QPushButton()
+        edit_button_image_address = resource_path('design/images/edit.png')
+        edit_button_image = QPixmap(edit_button_image_address)
+        edit_button_image = edit_button_image.scaledToWidth(30)
+        patient_complaints_edit_button.setIcon(QIcon(edit_button_image))
+        patient_complaints_edit_button.setIconSize(edit_button_image.rect().size())
+        patient_complaints_edit_button.setCursor(Qt.PointingHandCursor)
+        patient_complaints_edit_button.setFlat(True)
+        patient_complaints_edit_button.clicked.connect(lambda : self.complaints_edit(patient_complaints_add_widget, patient_complaints_text, patient_lmp, patient_pregnant, patient_complaints_edit_button, patient_complaints_save_button))
+
+        patient_complaints_save_button = QPushButton()
+        save_button_image_address = resource_path('design/images/confirm.png')
+        save_button_image = QPixmap(save_button_image_address)
+        save_button_image = save_button_image.scaledToWidth(30)
+        patient_complaints_save_button.setIcon(QIcon(save_button_image))
+        patient_complaints_save_button.setIconSize(save_button_image.rect().size())
+        patient_complaints_save_button.setCursor(Qt.PointingHandCursor)
+        patient_complaints_save_button.setFlat(True)
+        patient_complaints_save_button.setVisible(False)
+        patient_complaints_save_button.clicked.connect(lambda : self.complaints_save(patient_complaints_add_widget, patient_complaints_text, patient_lmp, patient_pregnant, patient_complaints_edit_button, patient_complaints_save_button))
+
+        patient_complaint_history_header_layout.addWidget(patient_complaints_history_label)
+        patient_complaint_history_header_layout.addWidget(patient_complaints_edit_button)
+        patient_complaint_history_header_layout.addWidget(patient_complaints_save_button)
+
 
         patient_complaints_add_layout = QHBoxLayout()
         patient_complaints_add_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
@@ -1891,7 +1927,9 @@ class DoctorUI(QWidget):
             "    subcontrol-origin: margin;"
             "}"
         )
-        patient_complaints_table.itemDoubleClicked.connect(lambda item: self.delete_row(item, patient_complaints_table))
+        patient_complaints_table.itemDoubleClicked.connect(lambda item: self.delete_row(item, patient_complaints_table, patient_complaints_edit_button.isVisible()))
+
+        patient_complaints_add_widget.setVisible(False)
 
         patient_lmp_layout = QHBoxLayout()
         patient_lmp_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
@@ -1934,7 +1972,607 @@ class DoctorUI(QWidget):
         patient_lmp_layout.addWidget(patient_lmp_label)
         patient_lmp_layout.addWidget(patient_lmp)
 
+        patient_pregnant_layout = QHBoxLayout()
+        patient_pregnant_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        patient_pregnant_layout.setContentsMargins(0, 0, 0, 0)
+        patient_pregnant_layout.setSpacing(0)
+        patient_pregnant_widget = QWidget()
+        patient_pregnant_widget.setStyleSheet("")
+        patient_pregnant_widget.setContentsMargins(0, 5, 0, 5)
+        patient_pregnant_widget.setLayout(patient_pregnant_layout)
+        patient_pregnant_label = QLabel('Pregnant: ')
+        patient_pregnant_label.setFont(entries_font)
+        patient_pregnant_label.setFixedHeight(40)
+        patient_pregnant_label.setFixedWidth(int(0.06*screen_width))
+        patient_pregnant_label.setContentsMargins(0, 0, 0, 0)
+        patient_pregnant = QComboBox()
+        patient_pregnant.addItems(['Yes', 'No'])
+        patient_pregnant.setEditable(True)
+        patient_pregnant.setCurrentText("No")
+        patient_pregnant.setStyleSheet(
+            "QComboBox {"
+            "    background-color: rgb(255, 255, 255);"
+            "    color: rgb(40, 40, 40);"
+            "    font: 10pt \"Poppins\";"
+            "    padding: 5px;"
+            "    border-radius: 20px;"
+            "}"
+            # Hide the box at the side
+            "QComboBox::drop-down {"
+            "    border: none;"
+            "}"
+        )
+        patient_pregnant.setFixedHeight(40)
+        patient_pregnant.setFixedWidth(int(0.08*screen_width))
+        patient_pregnant.setContentsMargins(0, 0, 0, 0)
+        patient_pregnant.setFont(QFont(patient_pregnant.font().family(), italic=True))
+        patient_pregnant.currentIndexChanged.connect(lambda: self.pregnant_dropdown_changed(patient_pregnant.currentText(), patient_lmp, patient_edd, patient_pog, patient_edd_widget, patient_pog_widget))
+
+        patient_pregnant_layout.addWidget(patient_pregnant_label)
+        patient_pregnant_layout.addWidget(patient_pregnant)
+
+        patient_edd_layout = QHBoxLayout()
+        patient_edd_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        patient_edd_layout.setContentsMargins(0, 0, 0, 0)
+        patient_edd_layout.setSpacing(0)
+        patient_edd_widget = QWidget()
+        patient_edd_widget.setStyleSheet("")
+        patient_edd_widget.setContentsMargins(0, 5, 0, 5)
+        patient_edd_widget.setLayout(patient_edd_layout)
+        patient_edd_label = QLabel('EDD: ')
+        patient_edd_label.setFont(entries_font)
+        patient_edd_label.setFixedHeight(40)
+        patient_edd_label.setFixedWidth(int(0.06*screen_width))
+        patient_edd_label.setContentsMargins(0, 0, 0, 0)
+        patient_edd = QDateEdit(self)
+        patient_edd.setReadOnly(True)
+        patient_edd.setDisplayFormat("dd-MM-yyyy")  # Set the desired date format
+        patient_edd.setStyleSheet("""
+            QDateEdit {
+                background-color: rgb(255, 255, 255);
+                color: rgb(40, 40, 40);
+                font: 10pt "Poppins";
+                padding: 5px;
+                border-radius: 20px;
+                border-top-right-radius: 0px;
+                border-bottom-right-radius: 0px;
+            }
+                                  
+            QDateEdit::drop-down {
+                subcontrol-origin: padding;
+                subcontrol-position: top right;
+                width: 20px;
+                border-left: 1px solid rgb(40, 40, 40);
+            }
+        """)
+        patient_edd.setFixedHeight(40)
+        patient_edd.setFixedWidth(int(0.08*screen_width))
+        patient_edd.setContentsMargins(0, 0, 0, 0)
         
+        patient_edd_layout.addWidget(patient_edd_label)
+        patient_edd_layout.addWidget(patient_edd)
+        patient_edd_widget.setVisible(False)
+
+        patient_pog_layout = QHBoxLayout()  
+        patient_pog_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        patient_pog_layout.setContentsMargins(0, 0, 0, 0)
+        patient_pog_layout.setSpacing(0)
+        patient_pog_widget = QWidget()
+        patient_pog_widget.setStyleSheet("")
+        patient_pog_widget.setContentsMargins(0, 5, 0, 5)
+        patient_pog_widget.setLayout(patient_pog_layout)
+        patient_pog_label = QLabel('POG: ')
+        patient_pog_label.setFont(entries_font)
+        patient_pog_label.setFixedHeight(40)
+        patient_pog_label.setFixedWidth(int(0.06*screen_width))
+        patient_pog_label.setContentsMargins(0, 0, 0, 0)
+        patient_pog = QLineEdit(self)
+        patient_pog.setReadOnly(True)
+        patient_pog.setStyleSheet(
+            "background-color: rgb(255, 255, 255);"
+            "color: rgb(40, 40, 40);"
+            "font: 10pt \"Poppins\";"
+            "padding: 5px;"
+            "border-radius: 20px;"
+        )
+        patient_pog.setFixedHeight(40)
+        patient_pog.setFixedWidth(int(0.1*screen_width))
+        patient_pog.setContentsMargins(0, 0, 0, 0)
+        patient_pog.setFont(QFont(patient_pog.font().family(), italic=True))
+
+        patient_pog_layout.addWidget(patient_pog_label)
+        patient_pog_layout.addWidget(patient_pog)
+        patient_pog_widget.setVisible(False)
+
+        patient_history_header_layout = QHBoxLayout()
+        patient_history_header_layout.setAlignment(Qt.AlignVCenter | Qt.AlignCenter)
+        patient_history_header_layout.setContentsMargins(0, 0, 0, 0)
+        patient_history_header_layout.setSpacing(0)
+        patient_history_header_widget = QWidget()
+        patient_history_header_widget.setStyleSheet("")
+        patient_history_header_widget.setContentsMargins(0, 5, 0, 5)
+        patient_history_header_widget.setLayout(patient_history_header_layout)
+
+        patient_history_label = QLabel('History')
+        patient_history_label.setStyleSheet("color: rgb(0, 0, 0); font: 15pt \"Poppins\"; font-weight: bold;")
+        patient_history_label.setFixedHeight(80)
+        patient_history_label.setContentsMargins(0, 0, 0, 0)
+        patient_history_label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+        patient_history_edit_button = QPushButton()
+        edit_button_image_address = resource_path('design/images/edit.png')
+        edit_button_image = QPixmap(edit_button_image_address)
+        edit_button_image = edit_button_image.scaledToWidth(30)
+        patient_history_edit_button.setIcon(QIcon(edit_button_image))
+        patient_history_edit_button.setIconSize(edit_button_image.rect().size())
+        patient_history_edit_button.setCursor(Qt.PointingHandCursor)
+        patient_history_edit_button.setFlat(True)
+        patient_history_edit_button.clicked.connect(lambda : self.history_edit(patient_obst_history_add_widget, patient_family_history_add_widget, patient_past_history_add_widget, patient_history_edit_button, patient_history_save_button))
+
+        patient_history_save_button = QPushButton()
+        save_button_image_address = resource_path('design/images/confirm.png')
+        save_button_image = QPixmap(save_button_image_address)
+        save_button_image = save_button_image.scaledToWidth(30)
+        patient_history_save_button.setIcon(QIcon(save_button_image))
+        patient_history_save_button.setIconSize(save_button_image.rect().size())
+        patient_history_save_button.setCursor(Qt.PointingHandCursor)
+        patient_history_save_button.setFlat(True)
+        patient_history_save_button.setVisible(False)
+        patient_history_save_button.clicked.connect(lambda : self.history_save(patient_obst_history_add_widget, patient_family_history_add_widget, patient_past_history_add_widget, patient_history_edit_button, patient_history_save_button))
+
+        patient_history_header_layout.addWidget(patient_history_label)
+        patient_history_header_layout.addWidget(patient_history_edit_button)
+        patient_history_header_layout.addWidget(patient_history_save_button)
+
+        patient_obst_history_layout = QVBoxLayout()
+        patient_obst_history_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        patient_obst_history_layout.setContentsMargins(0, 0, 0, 0)
+        patient_obst_history_layout.setSpacing(0)
+        patient_obst_history_widget = QWidget()
+        patient_obst_history_widget.setStyleSheet("")
+        patient_obst_history_widget.setContentsMargins(0, 5, 0, 5)
+        patient_obst_history_widget.setLayout(patient_obst_history_layout)
+        patient_obst_history_label = QLabel('Obstetric History: ')
+        patient_obst_history_label.setFont(entries_font)
+        patient_obst_history_label.setFixedHeight(40)
+        patient_obst_history_label.setContentsMargins(0, 0, 0, 0)
+        patient_obst_history_add = QHBoxLayout()
+        patient_obst_history_add.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        patient_obst_history_add.setContentsMargins(0, 0, 0, 0)
+        patient_obst_history_add.setSpacing(0)
+        patient_obst_history_add_widget = QWidget()
+        patient_obst_history_add_widget.setStyleSheet("")
+        patient_obst_history_add_widget.setContentsMargins(0, 5, 0, 5)
+        patient_obst_history_add_widget.setLayout(patient_obst_history_add)
+        patient_obst_history_text = QLineEdit(self)
+        patient_obst_history_text.setStyleSheet(
+            "background-color: rgb(255, 255, 255);"
+            "color: rgb(40, 40, 40);"
+            "font: 10pt \"Poppins\";"
+            "padding: 5px;"
+            "border-radius: 20px;"
+        )
+        patient_obst_history_text.setFixedHeight(40)
+        patient_obst_history_text.setFixedWidth(int(0.24*screen_width))
+        patient_obst_history_text.setContentsMargins(0, 0, 0, 0)
+        patient_obst_history_text.setFont(QFont(patient_obst_history_text.font().family(), italic=True))
+
+        patient_obst_history_add_button = QPushButton('Add')
+        patient_obst_history_add_button.setStyleSheet(
+            "background-color: rgb(67, 79, 194);"
+            "color: rgb(245, 245, 245);"
+            "font: 10pt \"Poppins\";"
+            "border-radius: 20px;"
+        )
+        patient_obst_history_add_button.setFixedHeight(40)
+        patient_obst_history_add_button.setFixedWidth(int(0.08*screen_width))
+        patient_obst_history_add_button.setContentsMargins(0, 0, 0, 0)
+        patient_obst_history_add_button.clicked.connect(lambda: self.add_obst_history(patient_obst_history_table, patient_obst_history_text.text()))
+        
+        patient_obst_history_layout.addWidget(patient_obst_history_label)
+        patient_obst_history_add.addWidget(patient_obst_history_text)
+        patient_obst_history_add.addWidget(patient_obst_history_add_button)
+        patient_obst_history_add_widget.setVisible(False)
+
+        patient_obst_history_table = QTableWidget()
+        patient_obst_history_table.setFixedHeight(200)
+        patient_obst_history_table.setFixedWidth(int(0.24*screen_width))
+        patient_obst_history_table.setViewportMargins(0, 10, 0, 0)
+        patient_obst_history_table.setContentsMargins(0, 10, 0, 0)
+        patient_obst_history_table.setFont(QFont(patient_obst_history_table.font().family(), italic=True))
+        patient_obst_history_table.setColumnCount(1)
+        patient_obst_history_table.setRowCount(0)
+
+        if patient_obst_history_table.rowCount() == 0:
+            patient_obst_history_table.setVisible(False)
+
+        patient_obst_history_table.setHorizontalHeaderLabels(['Obstetric History'])
+        patient_obst_history_table.horizontalHeader().setStyleSheet(
+            "QHeaderView {"
+            "    background-color: rgb(67, 79, 194);"
+            "    color: rgb(0, 0, 0);"
+            "    font: 10pt \"Poppins\";"
+            "    border-radius: 20px;"
+            "}"
+        )
+        patient_obst_history_table.horizontalHeader().setFixedHeight(40)
+        patient_obst_history_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        patient_obst_history_table.verticalHeader().hide()
+        patient_obst_history_table.setShowGrid(False)
+        patient_obst_history_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        patient_obst_history_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        patient_obst_history_table.setSelectionMode(QAbstractItemView.SingleSelection)
+        patient_obst_history_table.setAlternatingRowColors(True)
+        patient_obst_history_table.setStyleSheet(
+            "QTableView {"
+            "    background-color: rgb(255, 255, 255);"
+            "    alternate-background-color: rgb(240, 240, 240);"
+            "    color: rgb(40, 40, 40);"
+            "    font: 10pt \"Poppins\";"
+            "    padding: 5px;"
+            "    border-radius: 20px;"
+            "}"
+        )
+        patient_obst_history_table.verticalScrollBar().setStyleSheet(
+            "QScrollBar:vertical {"
+            "    border: 0px;"
+            "    background: #f0f0f0;"
+            "    width: 10px;"
+            "    margin: 0px 0px 0px 0px;"
+            "}"
+
+            "QScrollBar::handle:vertical {"
+            "    background: #666666;"
+            "    min-height: 20px;"
+            "}"
+
+            "QScrollBar::add-line:vertical {"
+            "    height: 0px;"
+            "    subcontrol-position: bottom;"
+            "    subcontrol-origin: margin;"
+            "}"
+
+            "QScrollBar::sub-line:vertical {"
+            "    height: 0 px;"
+            "    subcontrol-position: top;"
+            "    subcontrol-origin: margin;"
+            "}"
+        )
+        patient_obst_history_table.itemDoubleClicked.connect(lambda item: self.delete_obst_row(item, patient_obst_history_table, patient_history_edit_button.isVisible()))
+
+        patient_family_history_layout = QHBoxLayout()
+        patient_family_history_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        patient_family_history_layout.setContentsMargins(0, 0, 0, 0)
+        patient_family_history_layout.setSpacing(0)
+        patient_family_history_widget = QWidget()
+        patient_family_history_widget.setStyleSheet("")
+        patient_family_history_widget.setContentsMargins(0, 5, 0, 5)
+        patient_family_history_widget.setLayout(patient_family_history_layout)
+        patient_family_history_label = QLabel('Family History: ')
+        patient_family_history_label.setFont(entries_font)
+        patient_family_history_label.setFixedHeight(40)
+        patient_family_history_label.setContentsMargins(0, 0, 0, 0)
+        patient_family_history_add = QHBoxLayout()
+        patient_family_history_add.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        patient_family_history_add.setContentsMargins(0, 0, 0, 0)
+        patient_family_history_add.setSpacing(0)
+        patient_family_history_add_widget = QWidget()
+        patient_family_history_add_widget.setStyleSheet("")
+        patient_family_history_add_widget.setContentsMargins(0, 5, 0, 5)
+        patient_family_history_add_widget.setLayout(patient_family_history_add)
+        patient_family_history_text = QLineEdit(self)
+        patient_family_history_text.setStyleSheet(
+            "background-color: rgb(255, 255, 255);"
+            "color: rgb(40, 40, 40);"
+            "font: 10pt \"Poppins\";"
+            "padding: 5px;"
+            "border-radius: 20px;"
+        )
+        patient_family_history_text.setFixedHeight(40)
+        patient_family_history_text.setFixedWidth(int(0.24*screen_width))
+        patient_family_history_text.setContentsMargins(0, 0, 0, 0)
+        patient_family_history_text.setFont(QFont(patient_family_history_text.font().family(), italic=True))
+
+        patient_family_history_add_button = QPushButton('Add')
+        patient_family_history_add_button.setStyleSheet(
+            "background-color: rgb(67, 79, 194);"
+            "color: rgb(245, 245, 245);"
+            "font: 10pt \"Poppins\";"
+            "border-radius: 20px;"
+        )
+        patient_family_history_add_button.setFixedHeight(40)
+        patient_family_history_add_button.setFixedWidth(int(0.08*screen_width))
+        patient_family_history_add_button.setContentsMargins(0, 0, 0, 0)
+        patient_family_history_add_button.clicked.connect(lambda: self.add_family_history(patient_family_history_table, patient_family_history_text.text()))
+
+        patient_family_history_layout.addWidget(patient_family_history_label)
+        patient_family_history_add.addWidget(patient_family_history_text)
+        patient_family_history_add.addWidget(patient_family_history_add_button)
+        patient_family_history_add_widget.setVisible(False)
+
+        patient_family_history_table = QTableWidget()
+        patient_family_history_table.setFixedHeight(200)
+        patient_family_history_table.setFixedWidth(int(0.24*screen_width))
+        patient_family_history_table.setViewportMargins(0, 10, 0, 0)
+        patient_family_history_table.setContentsMargins(0, 10, 0, 0)
+        patient_family_history_table.setFont(QFont(patient_family_history_table.font().family(), italic=True))
+        patient_family_history_table.setColumnCount(1)
+        patient_family_history_table.setRowCount(0)
+
+        if patient_family_history_table.rowCount() == 0:
+            patient_family_history_table.setVisible(False)
+
+        patient_family_history_table.setHorizontalHeaderLabels(['Family History'])
+        patient_family_history_table.horizontalHeader().setStyleSheet(
+            "QHeaderView {"
+            "    background-color: rgb(67, 79, 194);"
+            "    color: rgb(0, 0, 0);"
+            "    font: 10pt \"Poppins\";"
+            "    border-radius: 20px;"
+            "}"
+        )
+        patient_family_history_table.horizontalHeader().setFixedHeight(40)
+        patient_family_history_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        patient_family_history_table.verticalHeader().hide()
+        patient_family_history_table.setShowGrid(False)
+        patient_family_history_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        patient_family_history_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        patient_family_history_table.setSelectionMode(QAbstractItemView.SingleSelection)
+        patient_family_history_table.setAlternatingRowColors(True)
+        patient_family_history_table.setStyleSheet(
+            "QTableView {"
+            "    background-color: rgb(255, 255, 255);"
+            "    alternate-background-color: rgb(240, 240, 240);"
+            "    color: rgb(40, 40, 40);"
+            "    font: 10pt \"Poppins\";"
+            "    padding: 5px;"
+            "    border-radius: 20px;"
+            "}"
+        )
+        patient_family_history_table.verticalScrollBar().setStyleSheet(
+            "QScrollBar:vertical {"
+            "    border: 0px;"
+            "    background: #f0f0f0;"
+            "    width: 10px;"
+            "    margin: 0px 0px 0px 0px;"
+            "}"
+
+            "QScrollBar::handle:vertical {"
+            "    background: #666666;"
+            "    min-height: 20px;"
+            "}"
+
+            "QScrollBar::add-line:vertical {"
+            "    height: 0px;"
+            "    subcontrol-position: bottom;"
+            "    subcontrol-origin: margin;"
+            "}"
+
+            "QScrollBar::sub-line:vertical {"
+            "    height: 0 px;"
+            "    subcontrol-position: top;"
+            "    subcontrol-origin: margin;"
+            "}"
+        )
+        patient_family_history_table.itemDoubleClicked.connect(lambda item: self.delete_family_row(item, patient_family_history_table, patient_history_edit_button.isVisible()))
+
+        patient_past_history_layout = QHBoxLayout()
+        patient_past_history_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        patient_past_history_layout.setContentsMargins(0, 0, 0, 0)
+        patient_past_history_layout.setSpacing(0)
+        patient_past_history_widget = QWidget()
+        patient_past_history_widget.setStyleSheet("")
+        patient_past_history_widget.setContentsMargins(0, 5, 0, 5)
+        patient_past_history_widget.setLayout(patient_past_history_layout)
+        patient_past_history_label = QLabel('Past History: ')
+        patient_past_history_label.setFont(entries_font)
+        patient_past_history_label.setFixedHeight(40)
+        patient_past_history_label.setContentsMargins(0, 0, 0, 0)
+        patient_past_history_add = QHBoxLayout()
+        patient_past_history_add.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        patient_past_history_add.setContentsMargins(0, 0, 0, 0)
+        patient_past_history_add.setSpacing(0)
+        patient_past_history_add_widget = QWidget()
+        patient_past_history_add_widget.setStyleSheet("")
+        patient_past_history_add_widget.setContentsMargins(0, 5, 0, 5)
+        patient_past_history_add_widget.setLayout(patient_past_history_add)
+        patient_past_history_text = QLineEdit(self)
+        patient_past_history_text.setStyleSheet(
+            "background-color: rgb(255, 255, 255);"
+            "color: rgb(40, 40, 40);"
+            "font: 10pt \"Poppins\";"
+            "padding: 5px;"
+            "border-radius: 20px;"
+        )
+        patient_past_history_text.setFixedHeight(40)
+        patient_past_history_text.setFixedWidth(int(0.24*screen_width))
+        patient_past_history_text.setContentsMargins(0, 0, 0, 0)
+        patient_past_history_text.setFont(QFont(patient_past_history_text.font().family(), italic=True))
+
+        patient_past_history_add_button = QPushButton('Add')
+        patient_past_history_add_button.setStyleSheet(
+            "background-color: rgb(67, 79, 194);"
+            "color: rgb(245, 245, 245);"
+            "font: 10pt \"Poppins\";"
+            "border-radius: 20px;"
+        )
+        patient_past_history_add_button.setFixedHeight(40)
+        patient_past_history_add_button.setFixedWidth(int(0.08*screen_width))
+        patient_past_history_add_button.setContentsMargins(0, 0, 0, 0)
+        patient_past_history_add_button.clicked.connect(lambda: self.add_past_history(patient_past_history_table, patient_past_history_text.text()))
+
+        patient_past_history_layout.addWidget(patient_past_history_label)
+        patient_past_history_add.addWidget(patient_past_history_text)
+        patient_past_history_add.addWidget(patient_past_history_add_button)
+        patient_past_history_add_widget.setVisible(False)
+
+        patient_past_history_table = QTableWidget()
+        patient_past_history_table.setFixedHeight(200)
+        patient_past_history_table.setFixedWidth(int(0.24*screen_width))
+        patient_past_history_table.setViewportMargins(0, 10, 0, 0)
+        patient_past_history_table.setContentsMargins(0, 10, 0, 0)
+        patient_past_history_table.setFont(QFont(patient_past_history_table.font().family(), italic=True))
+        patient_past_history_table.setColumnCount(1)
+        patient_past_history_table.setRowCount(0)
+
+        if patient_past_history_table.rowCount() == 0:
+            patient_past_history_table.setVisible(False)
+
+        patient_past_history_table.setHorizontalHeaderLabels(['Past History'])
+        patient_past_history_table.horizontalHeader().setStyleSheet(
+            "QHeaderView {"
+            "    background-color: rgb(67, 79, 194);"
+            "    color: rgb(0, 0, 0);"
+            "    font: 10pt \"Poppins\";"
+            "    border-radius: 20px;"
+            "}"
+        )
+        patient_past_history_table.horizontalHeader().setFixedHeight(40)
+        patient_past_history_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        patient_past_history_table.verticalHeader().hide()
+        patient_past_history_table.setShowGrid(False)
+        patient_past_history_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        patient_past_history_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        patient_past_history_table.setSelectionMode(QAbstractItemView.SingleSelection)
+        patient_past_history_table.setAlternatingRowColors(True)
+        patient_past_history_table.setStyleSheet(
+            "QTableView {"
+            "    background-color: rgb(255, 255, 255);"
+            "    alternate-background-color: rgb(240, 240, 240);"
+            "    color: rgb(40, 40, 40);"
+            "    font: 10pt \"Poppins\";"
+            "    padding: 5px;"
+            "    border-radius: 20px;"
+            "}"
+        )
+        patient_past_history_table.verticalScrollBar().setStyleSheet(
+            "QScrollBar:vertical {"
+            "    border: 0px;"
+            "    background: #f0f0f0;"
+            "    width: 10px;"
+            "    margin: 0px 0px 0px 0px;"
+            "}"
+
+            "QScrollBar::handle:vertical {"
+            "    background: #666666;"
+            "    min-height: 20px;"
+            "}"
+
+            "QScrollBar::add-line:vertical {"
+            "    height: 0px;"
+            "    subcontrol-position: bottom;"
+            "    subcontrol-origin: margin;"
+            "}"
+
+            "QScrollBar::sub-line:vertical {"
+            "    height: 0 px;"
+            "    subcontrol-position: top;"
+            "    subcontrol-origin: margin;"
+            "}"
+        )
+        patient_past_history_table.itemDoubleClicked.connect(lambda item: self.delete_past_row(item, patient_past_history_table, patient_history_edit_button.isVisible()))
+
+        patient_payment_header_layout = QHBoxLayout()
+        patient_payment_header_layout.setAlignment(Qt.AlignVCenter | Qt.AlignCenter)
+        patient_payment_header_layout.setContentsMargins(0, 0, 0, 0)
+        patient_payment_header_layout.setSpacing(0)
+        patient_payment_header_widget = QWidget()
+        patient_payment_header_widget.setStyleSheet("")
+        patient_payment_header_widget.setContentsMargins(0, 5, 0, 5)
+        patient_payment_header_widget.setLayout(patient_payment_header_layout)
+
+        patient_payment_label = QLabel('Payment')
+        patient_payment_label.setStyleSheet("color: rgb(0, 0, 0); font: 15pt \"Poppins\"; font-weight: bold;")
+        patient_payment_label.setFixedHeight(80)
+        patient_payment_label.setContentsMargins(0, 0, 0, 0)
+        patient_payment_label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+        patient_payment_edit_button = QPushButton()
+        edit_button_image_address = resource_path('design/images/edit.png')
+        edit_button_image = QPixmap(edit_button_image_address)
+        edit_button_image = edit_button_image.scaledToWidth(30)
+        patient_payment_edit_button.setIcon(QIcon(edit_button_image))
+        patient_payment_edit_button.setIconSize(edit_button_image.rect().size())
+        patient_payment_edit_button.setCursor(Qt.PointingHandCursor)
+        patient_payment_edit_button.setFlat(True)
+        patient_payment_edit_button.clicked.connect(lambda : self.payment_edit(patient_payment, patient_payment_mode, patient_payment_edit_button, patient_payment_save_button))
+
+        patient_payment_save_button = QPushButton()
+        save_button_image_address = resource_path('design/images/confirm.png')
+        save_button_image = QPixmap(save_button_image_address)
+        save_button_image = save_button_image.scaledToWidth(30)
+        patient_payment_save_button.setIcon(QIcon(save_button_image))
+        patient_payment_save_button.setIconSize(save_button_image.rect().size())
+        patient_payment_save_button.setCursor(Qt.PointingHandCursor)
+        patient_payment_save_button.setFlat(True)
+        patient_payment_save_button.setVisible(False)
+        patient_payment_save_button.clicked.connect(lambda : self.payment_save(patient_payment, patient_payment_mode, patient_payment_edit_button, patient_payment_save_button))
+
+        patient_payment_header_layout.addWidget(patient_payment_label)
+        patient_payment_header_layout.addWidget(patient_payment_edit_button)
+        patient_payment_header_layout.addWidget(patient_payment_save_button)
+
+        patient_payment_layout = QHBoxLayout()
+        patient_payment_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        patient_payment_layout.setContentsMargins(0, 0, 0, 0)
+        patient_payment_layout.setSpacing(0)
+        patient_payment_widget = QWidget()
+        patient_payment_widget.setStyleSheet("")
+        patient_payment_widget.setContentsMargins(0, 5, 0, 5)
+        patient_payment_widget.setLayout(patient_payment_layout)
+        patient_payment_label = QLabel('Payment: ')
+        patient_payment_label.setFont(entries_font)
+        patient_payment_label.setFixedHeight(40)
+        patient_payment_label.setFixedWidth(int(0.06*screen_width))
+        patient_payment_label.setContentsMargins(0, 0, 0, 0)
+        patient_payment = QLineEdit(self)
+        patient_payment.setReadOnly(True)
+        patient_payment.setStyleSheet(
+            "background-color: rgb(255, 255, 255);"
+            "color: rgb(40, 40, 40);"
+            "font: 10pt \"Poppins\";"
+            "padding: 5px;"
+            "border-radius: 20px;"
+        )
+        patient_payment.setFixedHeight(40)
+        patient_payment.setFixedWidth(int(0.08*screen_width))
+        patient_payment.setContentsMargins(0, 0, 0, 0)
+        patient_payment.setFont(QFont(patient_payment.font().family(), italic=True))
+
+        patient_payment_mode_label = QLabel('By: ')
+        patient_payment_mode_label.setFont(entries_font)
+        patient_payment_mode_label.setFixedHeight(40)
+        patient_payment_mode_label.setFixedWidth(int(0.06*screen_width))
+        patient_payment_mode_label.setContentsMargins(0, 0, 0, 0)
+        patient_payment_mode = QComboBox()
+        patient_payment_mode.addItems(['Cash', 'UPI'])
+        patient_payment_mode.setEditable(True)
+        patient_payment_mode.setCurrentText("Cash")
+        patient_payment_mode.setStyleSheet(
+            "QComboBox {"
+            "    background-color: rgb(255, 255, 255);"
+            "    color: rgb(40, 40, 40);"
+            "    font: 10pt \"Poppins\";"
+            "    padding: 5px;"
+            "    border-radius: 20px;"
+            "}"
+            # Hide the box at the side
+            "QComboBox::drop-down {"
+            "    border: none;"
+            "}"
+        )
+        patient_payment_mode.setFixedHeight(40)
+        patient_payment_mode.setFixedWidth(int(0.08*screen_width))
+        patient_payment_mode.setContentsMargins(0, 0, 0, 0)
+        patient_payment_mode.setFont(QFont(patient_payment_mode.font().family(), italic=True))
+        
+        patient_payment_layout.addWidget(patient_payment_label)
+        patient_payment_layout.addWidget(patient_payment)
+        patient_payment_layout.addWidget(patient_payment_mode_label)
+        patient_payment_layout.addWidget(patient_payment_mode)
+
+
+
         patient_details_layout.addWidget(patient_details_heading_widget)
         patient_details_layout.addWidget(patient_name_widget)
         patient_details_layout.addWidget(patient_guardian_widget)
@@ -1964,11 +2602,27 @@ class DoctorUI(QWidget):
         patient_details_layout.addWidget(patient_urine_widget)
         patient_details_layout.addWidget(patient_USG_widget)
         patient_details_layout.addWidget(patient_other_widget)
-        patient_details_layout.addWidget(patient_complaints_history_label)
+        patient_details_layout.addWidget(patient_complaint_history_header_widget)
         patient_details_layout.addWidget(patient_complaints_add_widget)
         patient_details_layout.addWidget(patient_complaints_text)
         patient_details_layout.addWidget(patient_complaints_table)
         patient_details_layout.addWidget(patient_lmp_widget)
+        patient_details_layout.addWidget(patient_pregnant_widget)
+        patient_details_layout.addWidget(patient_edd_widget)
+        patient_details_layout.addWidget(patient_pog_widget)
+        patient_details_layout.addWidget(patient_history_header_widget)
+        patient_details_layout.addWidget(patient_obst_history_widget)
+        patient_details_layout.addWidget(patient_obst_history_add_widget)
+        patient_details_layout.addWidget(patient_obst_history_table)
+        patient_details_layout.addWidget(patient_family_history_widget)
+        patient_details_layout.addWidget(patient_family_history_add_widget)
+        patient_details_layout.addWidget(patient_family_history_table)
+        patient_details_layout.addWidget(patient_past_history_widget)
+        patient_details_layout.addWidget(patient_past_history_add_widget)
+        patient_details_layout.addWidget(patient_past_history_table)
+        patient_details_layout.addWidget(patient_payment_header_widget)
+        patient_details_layout.addWidget(patient_payment_widget)
+
         
 
 
@@ -2131,7 +2785,9 @@ class DoctorUI(QWidget):
             table.setItem(table.rowCount()-1, 0, QTableWidgetItem(complaint))
         table.setItem(table.rowCount()-1, 1, QTableWidgetItem(duration))
 
-    def delete_row(self, item, table):
+    def delete_row(self, item, table, edit_button_visible):
+        if edit_button_visible:
+            return
         row = item.row()
         table.removeRow(row)
         if table.rowCount() == 0:
@@ -2249,6 +2905,140 @@ class DoctorUI(QWidget):
         report_edit_button.setVisible(True)
         report_save_button.setVisible(False)
 
+    def complaints_edit(self, complaints_add_widget, complaints_text, lmp, pregnant, complaints_edit_button, complaints_save_button):
+        complaints_add_widget.setVisible(True)
+        lmp.setReadOnly(False)
+        pregnant.setEditable(False)
+        complaints_edit_button.setVisible(False)
+        complaints_save_button.setVisible(True)
+
+    def complaints_save(self, complaints_add_widget, complaints_text, lmp, pregnant,complaints_edit_button, complaints_save_button):
+        complaints_add_widget.setVisible(False)
+        if complaints_text.isVisible():
+            complaints_text.setVisible(False)
+        lmp.setReadOnly(True)
+        pregnant.setEditable(True)
+        pregnant.setStyleSheet(
+            "QComboBox {"
+            "    background-color: rgb(255, 255, 255);"
+            "    color: rgb(40, 40, 40);"
+            "    font: 10pt \"Poppins\";"
+            "    padding: 5px;"
+            "    border-radius: 20px;"
+            "}"
+            # Hide the box at the side
+            "QComboBox::drop-down {"
+            "    border: none;"
+            "}"
+        )
+        complaints_edit_button.setVisible(True)
+        complaints_save_button.setVisible(False)
+
+    def pregnant_dropdown_changed(self, pregnant, lmp_widget, edd_widget, pog_widget, edd_widget_vis, pog_widget_vis):
+        if pregnant == 'Yes':
+            edd_widget_vis.setVisible(True)
+            pog_widget_vis.setVisible(True)
+        else:
+            edd_widget_vis.setVisible(False)
+            pog_widget_vis.setVisible(False)
+
+        lmp_date = lmp_widget.date().addDays(280)  # Assuming 280 days for a standard pregnancy
+        pog_days = lmp_widget.date().daysTo(QDateTime.currentDateTime().date())
+        pog_weeks = pog_days // 7
+        pog_remainder_days = pog_days % 7
+
+        # Update the widgets
+        edd_widget.setDate(lmp_date)
+        pog_widget.setText(f"{pog_weeks} weeks {pog_remainder_days} days")
+
+    def history_edit(self, obst_history_add, family_history_add, past_history_add, history_edit_button, history_save_button):
+        obst_history_add.setVisible(True)
+        family_history_add.setVisible(True)
+        past_history_add.setVisible(True)
+        history_edit_button.setVisible(False)
+        history_save_button.setVisible(True)
+
+    def history_save(self, obst_history_add, family_history_add, past_history_add, history_edit_button, history_save_button):
+        obst_history_add.setVisible(False)
+        family_history_add.setVisible(False)
+        past_history_add.setVisible(False)
+        history_edit_button.setVisible(True)
+        history_save_button.setVisible(False)
+
+    def add_obst_history(self, obst_history_table, obst_history_text):
+        if obst_history_text == '':
+            self.show_error("Please enter a valid obstetric history")
+            return
+        obst_history_table.setVisible(True)
+        obst_history_table.insertRow(obst_history_table.rowCount())
+        obst_history_table.setItem(obst_history_table.rowCount()-1, 0, QTableWidgetItem(obst_history_text))
+
+    def delete_obst_row(self, item, patient_obst_history_table, edit_button_visible):
+        if edit_button_visible:
+            return
+        row = item.row()
+        patient_obst_history_table.removeRow(row)
+        if patient_obst_history_table.rowCount() == 0:
+            patient_obst_history_table.setVisible(False)
+
+    def add_family_history(self, family_history_table, family_history_text):
+        if family_history_text == '':
+            self.show_error("Please enter a valid family history")
+            return
+        family_history_table.setVisible(True)
+        family_history_table.insertRow(family_history_table.rowCount())
+        family_history_table.setItem(family_history_table.rowCount()-1, 0, QTableWidgetItem(family_history_text))
+
+    def delete_family_row(self, item, patient_family_history_table, edit_button_visible):
+        if edit_button_visible:
+            return
+        row = item.row()
+        patient_family_history_table.removeRow(row)
+        if patient_family_history_table.rowCount() == 0:
+            patient_family_history_table.setVisible(False)
+
+    def add_past_history(self, past_history_table, past_history_text):
+        if past_history_text == '':
+            self.show_error("Please enter a valid past history")
+            return
+        past_history_table.setVisible(True)
+        past_history_table.insertRow(past_history_table.rowCount())
+        past_history_table.setItem(past_history_table.rowCount()-1, 0, QTableWidgetItem(past_history_text))
+
+    def delete_past_row(self, item, patient_past_history_table, edit_button_visible):
+        if edit_button_visible:
+            return
+        row = item.row()
+        patient_past_history_table.removeRow(row)
+        if patient_past_history_table.rowCount() == 0:
+            patient_past_history_table.setVisible(False)
+
+    def payment_edit(self, payment, payment_mode, payment_edit_button, payment_save_button):
+        payment.setReadOnly(False)
+        payment_mode.setEditable(False)
+        payment_edit_button.setVisible(False)
+        payment_save_button.setVisible(True)
+
+    def payment_save(self, payment, payment_mode, payment_edit_button, payment_save_button):
+        payment.setReadOnly(True)
+        payment_mode.setEditable(True)
+        payment_mode.setStyleSheet(
+            "QComboBox {"
+            "    background-color: rgb(255, 255, 255);"
+            "    color: rgb(40, 40, 40);"
+            "    font: 10pt \"Poppins\";"
+            "    padding: 5px;"
+            "    border-radius: 20px;"
+            "}"
+            # Hide the box at the side
+            "QComboBox::drop-down {"
+            "    border: none;"
+            "}"
+        )
+        payment_edit_button.setVisible(True)
+        payment_save_button.setVisible(False)
+
+
     def logout(self):
         from login_ui import LoginUI
         self.close()
@@ -2256,6 +3046,7 @@ class DoctorUI(QWidget):
         self.login_ui.show()
 
 if __name__ == '__main__':
+
     app = QApplication([])
     doctor_ui = DoctorUI(app)
     doctor_ui.show()
