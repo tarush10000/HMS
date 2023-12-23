@@ -1,0 +1,40 @@
+fever
+cough
+headache
+fatigue
+nausea
+vomiting
+abdominal pain
+diarrhea
+chest pain
+shortness of breath
+dizziness
+muscle aches
+joint pain
+rash
+sore throat
+runny nose
+loss of taste or smell
+chills
+conjunctivitis
+hives
+confusion
+loss of appetite
+seizures
+strokes
+swelling of the face, lips, tongue, or throat
+difficulty breathing or shortness of breath
+chest pain or pressure
+loss of speech or movement
+feeling confused or having a severe headache
+developing bluish lips or face
+feeling cold
+feeling sick
+feeling very tired
+diarrhea
+vomiting
+stomach pain
+loss of appetite
+feeling unsteady
+feeling dizzy
+cancer
