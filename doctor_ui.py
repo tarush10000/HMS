@@ -304,8 +304,214 @@ class DoctorUI(QWidget):
         patient_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         patient_table.setSelectionMode(QAbstractItemView.SingleSelection)
         patient_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        patient_table.itemClicked.connect(lambda item: self.row_single_clicked(item, patient_table, patient_first_name))
-        patient_table.itemDoubleClicked.connect(lambda item: self.row_double_clicked(item, patient_table, filter_widget))
+        patient_table.itemClicked.connect(lambda item: self.row_single_clicked(item, patient_table, patient_first_name, patient_middle_name,patient_last_name,patient_guardian_name,patient_occupation,patient_number1,patient_number2,patient_gender,patient_address,patient_age,patient_dob,patient_obst_history_text,patient_family_history_text,patient_past_history_text))
+        patient_table.itemDoubleClicked.connect(lambda item: self.row_double_clicked(item, patient_table, filter_widget, diagnostic_scroll_area))
+
+        #section for diagnostics and treatment (initially hidden)
+        diagnostic_scroll_area = QScrollArea(self)
+        diagnostic_scroll_area.setWidgetResizable(True)
+        diagnostic_scroll_area.setStyleSheet("background-color: rgb(235, 235, 235); border-radius: 20px; border: none;")
+        diagnostic_scroll_area.setContentsMargins(0, 0, 0, 0)
+        diagnostic_scroll_area.setFixedWidth(int(0.4*screen_width))
+        diagnostic_scroll_area.setFixedHeight(int(0.7*screen_height))
+        diagnostic_scroll_area.setVisible(False)
+
+        diagnostics_layout = QVBoxLayout()
+        diagnostics_layout.setAlignment(Qt.AlignVCenter | Qt.AlignCenter)
+        diagnostics_layout.setContentsMargins(0, 0, 0, 0)
+        diagnostics_layout.setSpacing(0)
+        diagnostics_widget = QWidget(diagnostic_scroll_area)
+        diagnostics_widget.setStyleSheet("")
+        diagnostics_widget.setContentsMargins(10, 10, 10, 10)
+        diagnostics_widget.setLayout(diagnostics_layout)
+
+        diagnostics_heading_layout = QHBoxLayout()
+        diagnostics_heading_layout.setAlignment(Qt.AlignVCenter | Qt.AlignCenter)
+        diagnostics_heading_layout.setContentsMargins(0, 0, 0, 0)
+        diagnostics_heading_layout.setSpacing(0)
+        diagnostics_heading_widget = QWidget()
+        diagnostics_heading_widget.setStyleSheet("")
+        diagnostics_heading_widget.setContentsMargins(0, 0, 0, 0)
+        diagnostics_heading_widget.setLayout(diagnostics_heading_layout)
+        diagnostics_heading_widget.setFixedHeight(80)
+        
+        diagnostics_label = QLabel('Diagnostics')
+        diagnostics_label.setStyleSheet("color: rgb(0, 0, 0); font: 15pt \"Poppins\"; font-weight: bold;")
+        diagnostics_label.setFixedHeight(80)
+        diagnostics_label.setContentsMargins(0, 0, 0, 0)
+        diagnostics_label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+
+        diagnostics_back_button = QPushButton()
+        back_button_image_address = resource_path('design/images/back.png')
+        back_button_image = QPixmap(back_button_image_address)
+        back_button_image = back_button_image.scaledToWidth(30)
+        diagnostics_back_button.setIcon(QIcon(back_button_image))
+        diagnostics_back_button.setIconSize(back_button_image.rect().size())
+        diagnostics_back_button.setCursor(Qt.PointingHandCursor)
+        diagnostics_back_button.setFlat(True)
+        diagnostics_back_button.clicked.connect(lambda : self.back_button_clicked(patient_table, filter_widget, diagnostic_scroll_area))
+
+        diagnostics_heading_layout.addWidget(diagnostics_back_button)
+        diagnostics_heading_layout.addWidget(diagnostics_label)
+
+        clinical_findings_heading = QLabel('Clinical Findings')
+        clinical_findings_heading.setStyleSheet("color: rgb(0, 0, 0); font: 12pt \"Poppins\"; font-weight: bold;")
+        clinical_findings_heading.setFixedHeight(40)
+        clinical_findings_heading.setContentsMargins(0, 0, 0, 0)
+        clinical_findings_heading.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+        clinical_findings_add_layout = QHBoxLayout()
+        clinical_findings_add_layout.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        clinical_findings_add_layout.setContentsMargins(0, 0, 0, 0)
+        clinical_findings_add_layout.setSpacing(0)
+        clinical_findings_add_widget = QWidget()
+        clinical_findings_add_widget.setStyleSheet("")
+        clinical_findings_add_widget.setContentsMargins(0, 5, 0, 5)
+        clinical_findings_add_widget.setLayout(clinical_findings_add_layout)
+        clinical_findings_add_text = QLineEdit(self)
+        clinical_findings_add_text.setPlaceholderText('Enter clinical findings')
+        clinical_findings_add_text.setStyleSheet(
+            "background-color: rgb(230, 230, 230);"
+            "color: rgb(0, 0, 0);" 
+            "font: 10pt \"Poppins\";"
+            "padding: 5px;"
+            "border: none;"
+            "border-radius: 20px;"
+            "margin-right: 5px;"
+        )
+        clinical_findings_add_text.setFixedHeight(40)
+        clinical_findings_add_text.setContentsMargins(0, 0, 0, 0)
+        clinical_findings_add_text.setFixedWidth(int(0.3*screen_width))
+        clinical_findings_add_text.setFont(QFont(clinical_findings_add_text.font().family(), italic=True))
+
+        file = open(resource_path('design/lists/clinical_findings.txt'), 'r')
+        clinical_findings = [line.strip() for line in file]
+
+        completer = QCompleter(clinical_findings, self)
+        completer.setCaseSensitivity(False)
+        clinical_findings_add_text.setCompleter(completer)
+        clinical_findings_add_text.textChanged.connect(lambda: self.update_clinical_findings_file(clinical_findings_add_text))
+        
+        clinical_findings_add_button = QPushButton()
+        clinical_findings_add_button.setStyleSheet(
+            "background-color: rgb(67, 79, 194);"
+            "color: rgb(245,245,245);"
+            "font: 10pt \"Poppins\";"
+            "padding: 5px;"
+            "border-radius: 10px;"
+            "margin-right: 5px;"
+        )
+        add_button_image_address = resource_path('design/images/add.png')
+        add_button_image = QPixmap(add_button_image_address)
+        add_button_image = add_button_image.scaledToWidth(30)
+        clinical_findings_add_button.setIcon(QIcon(add_button_image))
+        clinical_findings_add_button.setIconSize(add_button_image.rect().size())
+        clinical_findings_add_button.setCursor(Qt.PointingHandCursor)
+        clinical_findings_add_button.setFlat(True)
+        clinical_findings_add_button.clicked.connect(lambda : self.add_clinical_findings(clinical_findings_add_text, clinical_findings_add_button, clinical_findings_table))
+        clinical_findings_add_button.setVisible(True)
+
+        clinical_findings_add_layout.addWidget(clinical_findings_add_text)
+        clinical_findings_add_layout.addWidget(clinical_findings_add_button)
+
+        clinical_findings_table = QTableWidget()
+        clinical_findings_table.setFixedHeight(200)
+        clinical_findings_table.setFixedWidth(int(0.35*screen_width))
+        clinical_findings_table.setViewportMargins(0, 10, 0, 0)
+        clinical_findings_table.setContentsMargins(0, 10, 0, 0)
+        clinical_findings_table.setFont(QFont(clinical_findings_table.font().family(), italic=True))
+        clinical_findings_table.setColumnCount(1)
+        clinical_findings_table.setRowCount(0)
+
+        if clinical_findings_table.rowCount() == 0:
+            clinical_findings_table.setVisible(False)
+        clinical_findings_table.setHorizontalHeaderLabels(['Clinical Findings'])
+        
+        clinical_findings_table.horizontalHeader().setStyleSheet(
+            "QHeaderView {"
+            "    background-color: rgb(67, 79, 194);"
+            "    color: rgb(0, 0, 0);"
+            "    font: 10pt \"Poppins\";"
+            "    border-radius: 20px;"
+            "}"
+        )
+        clinical_findings_table.setStyleSheet(
+            "QTableView {"
+            "    background-color: rgb(255, 255, 255);"
+            "    alternate-background-color: rgb(240, 240, 240);"
+            "    color: rgb(40, 40, 40);"
+            "    font: 10pt \"Poppins\";"
+            "    padding: 5px;"
+            "    border-radius: 20px;"
+            "}"
+        )
+        clinical_findings_table.verticalScrollBar().setStyleSheet(
+            "QScrollBar:vertical {"
+            "    border: 0px;"
+            "    background: #f0f0f0;"
+            "    width: 10px;"
+            "    margin: 0px 0px 0px 0px;"
+            "}"
+
+            "QScrollBar::handle:vertical {"
+            "    background: #666666;"
+            "    min-height: 20px;"
+            "}"
+
+            "QScrollBar::add-line:vertical {"
+            "    height: 0px;"
+            "    subcontrol-position: bottom;"
+            "    subcontrol-origin: margin;"
+            "}"
+
+            "QScrollBar::sub-line:vertical {"
+            "    height: 0 px;"
+            "    subcontrol-position: top;"
+            "    subcontrol-origin: margin;"
+            "}"
+        )
+        clinical_findings_table.horizontalHeader().setFixedHeight(40)
+        clinical_findings_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        clinical_findings_table.verticalHeader().hide()
+        clinical_findings_table.setShowGrid(False)
+        clinical_findings_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        clinical_findings_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        clinical_findings_table.setSelectionMode(QAbstractItemView.SingleSelection)
+        clinical_findings_table.setAlternatingRowColors(True)
+
+        clinical_findings_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        clinical_findings_table.setSelectionMode(QAbstractItemView.SingleSelection)
+        clinical_findings_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        clinical_findings_table.itemDoubleClicked.connect(lambda item: self.findings_delete(item, clinical_findings_table, filter_widget, diagnostic_scroll_area))
+
+        internal_findings_heading = QLabel('Internal Findings')
+        internal_findings_heading.setStyleSheet("color: rgb(0, 0, 0); font: 12pt \"Poppins\"; font-weight: bold;")
+        internal_findings_heading.setFixedHeight(40)
+        internal_findings_heading.setContentsMargins(0, 0, 0, 0)
+        internal_findings_heading.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+        internal_findings_input = QPlainTextEdit(self)
+        internal_findings_input.setStyleSheet(
+            "background-color: rgb(250, 250, 250);"
+            "color: rgb(0, 0, 0);"
+            "font: 10pt \"Poppins\";"
+            "padding: 5px;"
+            "border: none;"
+            "border-radius: 20px;"
+            "margin: 0px;"
+        )
+        internal_findings_input.setFixedHeight(80)
+        internal_findings_input.setFixedWidth(int(0.35*screen_width))
+        internal_findings_input.setContentsMargins(0, 0, 0, 0)
+        internal_findings_input.setReadOnly(True)
+        
+        # add widgets to layouts
+        diagnostics_layout.addWidget(diagnostics_heading_widget)
+        diagnostics_layout.addWidget(clinical_findings_heading)
+        diagnostics_layout.addWidget(clinical_findings_add_widget)
+        diagnostics_layout.addWidget(clinical_findings_table)
+        diagnostics_layout.addWidget(internal_findings_heading)
+        diagnostics_layout.addWidget(internal_findings_input)
 
         scroll_area = QScrollArea(self)
         scroll_area.setWidgetResizable(True)
@@ -2757,11 +2963,30 @@ class DoctorUI(QWidget):
                     item = QTableWidgetItem(str(cell_data))
                     table.setItem(row_idx, col_idx, item)
 
-    def row_single_clicked(self, item, patient_table, first_name):
+    def row_single_clicked(self, item, patient_table, first_name,middle_name, last_name, guardian, occupation, phone_num1, phone_num2,
+                           sex,address1,age, dob,obstretic_his, family_his, past_his):
+        db = Database()
         row = item.row()
         patient_id = patient_table.item(row, 0).text()
         print(f"Row {row} clicked once. Patient ID: {patient_id}")
         first_name.setText(patient_table.item(row, 1).text())
+        middle_name.setText(db.get_middleName(row+1))
+        last_name.setText(db.get_lastName(row+1))
+        guardian.setText(db.get_guardian(row+1))
+        occupation.setText(db.get_occupation(row+1))
+        phone_num1.setText(db.get_phoneNum1(row+1))
+        phone_num2.setText(db.get_phoneNum2(row+1))
+        sex.setText(db.get_sex(row+1))
+        address1.setPlainText(f"{db.get_address1(row+1)}\n{db.get_address2(row+1)}")
+        dob.setText(db.get_dob(row+1).strftime("%d/%m/%Y"))
+        print(f"{type(db.get_dob(row+1))} dob")
+        age.setText(str(db.get_age(row+1)))
+        # blood_group.setText(db.get_blood_group(row+1))
+        obstretic_his.setText(db.get_obstetricHis(row+1))
+        family_his.setText(db.get_familyHis(row+1))
+        past_his.setText(db.get_pastHis(row+1))
+        # notes.setText(db.get_notes(row+1))
+
 
     def row_double_clicked(self, item, patient_table, filter, diagnostics):
         row = item.row()

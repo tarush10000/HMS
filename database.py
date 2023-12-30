@@ -55,6 +55,127 @@ class Database:
         self.cursor.execute(query)
         data = self.cursor.fetchall()
         return data
+    
+    #get patient details
+    
+    def get_firstName(self , id):
+        self.cursor = self.server_connect()
+        query = "SELECT first_name FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+    
+    def get_middleName(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT middle_name FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_lastName(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT last_name FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_guardian(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT guardian FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_occupation(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT occupation FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_phoneNum1(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT phone_num1 FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_phoneNum2(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT phone_num2 FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_sex(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT sex FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_address1(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT address1 FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_address2(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT address2 FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_dob(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT dob FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_age(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT age FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_bloodGroup(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT blood_group FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_obstetricHis(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT obstretic_his FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_familyHis(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT family_his FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_pastHis(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT past_his FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+
+    def get_notes(self, id):
+        self.cursor = self.server_connect()
+        query = "SELECT notes FROM patients_basic WHERE idpatients = %s"
+        self.cursor.execute(query, (id,), multi=False)
+        result = self.cursor.fetchone()
+        return result[0] if result else None
 
     # Add more database-related functions for managing patient records, medicine lists, etc.
 
